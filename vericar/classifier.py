@@ -61,29 +61,17 @@ def param_groups(model, lr_head: float, lr_top: float) -> list[dict]:
 
 # ------------------------------------------------------------------ data pipeline
 class CarCrops:
-    """Torch dataset of car crops. ``train=True`` adds moderate augmentation.
+    """Torch dataset of car crops returning uint8 CHW tensors (cheap CPU work only).
 
-    Augmentations keep make/model/year intact: horizontal flip, box-margin and
-    scale jitter, mild colour jitter, small random erasing. 10% of training
-    samples use the full frame so the model tolerates a bad / missing crop.
+    CPU side (workers): decode, crop (with box-margin / position jitter when training),
+    horizontal flip, resize - exactly the OpenCV resize the app uses at inference.
+    GPU side (``gpu_augment``): mild colour jitter, normalisation, small random erasing.
+    Augmentations keep make/model/year intact. 10% of training samples use the full
+    frame so the model tolerates a bad / missing crop.
     """
 
     def __init__(self, records: list[dict], train: bool):
-        import torch
-        from torchvision.transforms import v2 as T
-
         self.records, self.train = records, train
-        norm = [T.ToImage(), T.ToDtype(torch.float32, scale=True), T.Normalize(IMAGENET_MEAN, IMAGENET_STD)]
-        if train:
-            self.tf = T.Compose([
-                T.Resize((CLS_IMG_SIZE, CLS_IMG_SIZE), antialias=True),
-                T.RandomHorizontalFlip(),
-                T.ColorJitter(0.3, 0.3, 0.25, 0.02),
-                *norm,
-                T.RandomErasing(p=0.25, scale=(0.02, 0.12)),
-            ])
-        else:
-            self.tf = T.Compose([T.Resize((CLS_IMG_SIZE, CLS_IMG_SIZE), antialias=True), *norm])
 
     def __len__(self):
         return len(self.records)
@@ -100,10 +88,48 @@ class CarCrops:
         return crop_box(img, (x1 + jit(w), y1 + jit(h), x2 + jit(w), y2 + jit(h)), m)
 
     def __getitem__(self, i):
-        from PIL import Image
+        import cv2
+        import torch
         r = self.records[i]
-        img = np.asarray(Image.open(r["path"]).convert("RGB"))
-        return self.tf(Image.fromarray(self._crop(img, r["box"]))), r["label"]
+        img = cv2.cvtColor(cv2.imread(r["path"], cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+        crop = self._crop(img, r["box"])
+        if self.train and random.random() < 0.5:
+            crop = crop[:, ::-1]
+        interp = cv2.INTER_AREA if crop.shape[0] > CLS_IMG_SIZE else cv2.INTER_LINEAR
+        crop = cv2.resize(np.ascontiguousarray(crop), (CLS_IMG_SIZE, CLS_IMG_SIZE), interpolation=interp)
+        return torch.from_numpy(crop).permute(2, 0, 1).contiguous(), r["label"]
+
+
+def gpu_augment(x, train: bool):
+    """uint8 [B,3,H,W] on GPU -> normalised float. Training adds colour jitter + random erasing."""
+    import torch
+    x = x.float() / 255.0
+    if train:
+        b = x.shape[0]
+        r = lambda lo, hi: torch.empty(b, 1, 1, 1, device=x.device).uniform_(lo, hi)  # noqa: E731
+        x = x * r(0.7, 1.3)                                                    # brightness
+        m = x.mean(dim=(1, 2, 3), keepdim=True)
+        x = (x - m) * r(0.7, 1.3) + m                                          # contrast
+        g = (0.299 * x[:, 0:1] + 0.587 * x[:, 1:2] + 0.114 * x[:, 2:3])
+        x = (g + (x - g) * r(0.75, 1.25)).clamp_(0, 1)                         # saturation
+    mean = torch.tensor(IMAGENET_MEAN, device=x.device).view(1, 3, 1, 1)
+    std = torch.tensor(IMAGENET_STD, device=x.device).view(1, 3, 1, 1)
+    x = (x - mean) / std
+    if train:                                                                  # random erasing, p=0.25
+        b, _, h, w = x.shape
+        area = torch.empty(b, device=x.device).uniform_(0.02, 0.12) * h * w
+        ar = torch.exp(torch.empty(b, device=x.device).uniform_(-1.0, 1.0))
+        eh = (area * ar).sqrt().clamp(max=h).long()
+        ew = (area / ar).sqrt().clamp(max=w).long()
+        y0 = (torch.rand(b, device=x.device) * (h - eh + 1)).long()
+        x0 = (torch.rand(b, device=x.device) * (w - ew + 1)).long()
+        ys = torch.arange(h, device=x.device).view(1, h, 1)
+        xs = torch.arange(w, device=x.device).view(1, 1, w)
+        mask = (ys >= y0.view(-1, 1, 1)) & (ys < (y0 + eh).view(-1, 1, 1)) & \
+               (xs >= x0.view(-1, 1, 1)) & (xs < (x0 + ew).view(-1, 1, 1))
+        mask &= (torch.rand(b, device=x.device) < 0.25).view(-1, 1, 1)
+        x = x.masked_fill(mask.unsqueeze(1), 0.0)
+    return x
 
 
 # ------------------------------------------------------------------ inference

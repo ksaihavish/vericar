@@ -109,6 +109,33 @@ def detection_report(dets, gts) -> dict:
 
 
 # ------------------------------------------------------------------ verification / OOD
+def claim_sets(labels: np.ndarray, hard: np.ndarray, easy: np.ndarray) -> dict[str, np.ndarray]:
+    """Legit claim = true class; hard clone = most similar other class; easy clone = random other make."""
+    return {"legit": labels, "hard_clone": hard[labels], "easy_clone": easy[labels]}
+
+
+def cleared_rate(probs, claims, unknown, flagged, t: float) -> float:
+    """Fraction of claims that get MATCH (cleared) at threshold t (vectorised fast path)."""
+    p = probs[np.arange(len(claims)), claims]
+    return float(((p >= t) & ~unknown & ~flagged).mean())
+
+
+def clone_study(probs, labels, unknown, flagged, hier, thr, hard, easy) -> dict:
+    """Full verdict breakdown for legit / hard-clone / easy-clone claims."""
+    from collections import Counter
+
+    from .hybrid import verify
+    out = {}
+    for kind, claims in claim_sets(labels, hard, easy).items():
+        st = Counter(verify(p, int(c), hier, thr, bool(u), ["flag"] if f else None).status
+                     for p, c, u, f in zip(probs, claims, unknown, flagged))
+        out[kind] = {s: st[s] / len(claims) for s in ("MATCH", "PARTIAL", "INSPECT", "MISMATCH", "UNKNOWN", "RETAKE")}
+    out["false_alarm_rate"] = 1 - out["legit"]["MATCH"]
+    out["catch_rate_hard"] = 1 - out["hard_clone"]["MATCH"]
+    out["catch_rate_easy"] = 1 - out["easy_clone"]["MATCH"]
+    return out
+
+
 def auroc(scores_neg: np.ndarray, scores_pos: np.ndarray) -> float:
     """AUROC where higher score should mean 'positive' (e.g. out-of-distribution)."""
     from sklearn.metrics import roc_auc_score

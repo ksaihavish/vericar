@@ -4,8 +4,9 @@ Stage 1: backbone frozen, only the linear head trains (a few epochs).
 Stage 2: last two ConvNeXt stages + head train with discriminative LRs.
 Guards: hard epoch cap, early stopping on val loss, best checkpoint by val top-1,
 label smoothing, dropout, drop-path, weight decay, moderate augmentation, and a
-train-vs-val gap monitor (clean, non-augmented train subset) that STOPS training
-if the gap exceeds --max-gap points.
+train-vs-val gap monitor that STOPS training if (epoch train top-1 - val top-1)
+exceeds --max-gap points. The stricter clean-train gap (non-augmented train
+subset vs val) is logged every epoch as well and reported.
 
 Usage:  python scripts/train_classifier.py
 """
@@ -24,11 +25,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import numpy as np  # noqa: E402
 import torch  # noqa: E402
 import torch.nn as nn  # noqa: E402
+import torch.nn.functional as F  # noqa: E402
 from torch.utils.data import DataLoader  # noqa: E402
 
-from vericar.classifier import CarCrops, build_model, param_groups, set_trainable  # noqa: E402
+from vericar.classifier import CarCrops, build_model, gpu_augment, param_groups, set_trainable  # noqa: E402
 from vericar.config import CLS_IMG_SIZE, FEAT_DIR, MODELS_DIR, RUNS_DIR, SEED  # noqa: E402
 from vericar.data import class_names, load_split  # noqa: E402
+
+CL = torch.channels_last
 
 
 def seed_all(s: int) -> None:
@@ -38,41 +42,29 @@ def seed_all(s: int) -> None:
     torch.cuda.manual_seed_all(s)
 
 
-def loader(records, train, bs, workers):
+def loader(records, train, bs, workers, persistent=True):
     return DataLoader(CarCrops(records, train), batch_size=bs, shuffle=train, num_workers=workers,
-                      pin_memory=True, persistent_workers=workers > 0, drop_last=train)
+                      pin_memory=True, persistent_workers=persistent and workers > 0, drop_last=train)
 
 
 @torch.no_grad()
-def evaluate(model, dl, dev):
+def predict(model, dl, dev):
+    """Per-sample logits/feats/labels without augmentation."""
     model.eval()
-    ce = nn.CrossEntropyLoss(reduction="sum")
-    loss = top1 = top5 = n = 0
+    L, Fe, Y = [], [], []
     for x, y in dl:
-        x, y = x.to(dev, non_blocking=True).to(memory_format=torch.channels_last), y.to(dev)
-        with torch.autocast("cuda", dtype=torch.bfloat16):
-            logits, _ = model(x)
-        logits = logits.float()
-        loss += ce(logits, y).item()
-        top1 += (logits.argmax(1) == y).sum().item()
-        top5 += (logits.topk(5, 1).indices == y[:, None]).any(1).sum().item()
-        n += len(y)
-    return loss / n, top1 / n, top5 / n
-
-
-@torch.no_grad()
-def dump_outputs(model, records, dev, bs, workers, path):
-    """Logits + embeddings (no augmentation) for later calibration / fusion / OOD fitting."""
-    model.eval()
-    L, F, Y = [], [], []
-    for x, y in loader(records, False, bs, workers):
-        x = x.to(dev).to(memory_format=torch.channels_last)
+        x = gpu_augment(x.to(dev, non_blocking=True), False).to(memory_format=CL)
         with torch.autocast("cuda", dtype=torch.bfloat16):
             logits, feats = model(x)
-        L.append(logits.float().cpu().numpy())
-        F.append(feats.float().cpu().numpy().astype(np.float16))
-        Y.append(y.numpy())
-    np.savez_compressed(path, logits=np.concatenate(L), feats=np.concatenate(F), labels=np.concatenate(Y))
+        L.append(logits.float())
+        Fe.append(feats.float())
+        Y.append(y.to(dev))
+    return torch.cat(L), torch.cat(Fe), torch.cat(Y)
+
+
+def metrics(logits, y):
+    return (F.cross_entropy(logits, y).item(), (logits.argmax(1) == y).float().mean().item(),
+            (logits.topk(5, 1).indices == y[:, None]).any(1).float().mean().item())
 
 
 def cosine_warmup(opt, total_steps, warmup_steps):
@@ -87,13 +79,13 @@ def cosine_warmup(opt, total_steps, warmup_steps):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bs", type=int, default=32)
-    ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--workers", type=int, default=5)
     ap.add_argument("--head-epochs", type=int, default=3)
     ap.add_argument("--max-epochs", type=int, default=18)
     ap.add_argument("--patience", type=int, default=4)
     ap.add_argument("--lr-head", type=float, default=5e-4)
     ap.add_argument("--lr-top", type=float, default=1.2e-4)
-    ap.add_argument("--max-gap", type=float, default=10.0, help="stop if clean-train minus val top-1 > this (points)")
+    ap.add_argument("--max-gap", type=float, default=10.0, help="stop if epoch train top-1 minus val top-1 > this (points)")
     args = ap.parse_args()
 
     seed_all(SEED)
@@ -103,14 +95,13 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     names = class_names()
     train_recs, val_recs = load_split("train"), load_split("val")
-    rng = random.Random(SEED)
-    clean_train = rng.sample(train_recs, len(val_recs))  # same size as val, eval transform
+    clean_train = random.Random(SEED).sample(train_recs, len(val_recs))  # same size as val, no augmentation
+    nv = len(val_recs)
 
     dl_train = loader(train_recs, True, args.bs, args.workers)
-    dl_val = loader(val_recs, False, 64, args.workers)
-    dl_clean = loader(clean_train, False, 64, args.workers)
+    dl_eval = loader(val_recs + clean_train, False, 64, 2)   # one persistent loader: val then clean-train
 
-    model = build_model(len(names)).to(dev).to(memory_format=torch.channels_last)
+    model = build_model(len(names)).to(dev).to(memory_format=CL)
     crit = nn.CrossEntropyLoss(label_smoothing=0.1)
     history, best = [], {"val_top1": -1.0}
 
@@ -118,8 +109,7 @@ def main():
         nonlocal best
         set_trainable(model, stage)
         opt = torch.optim.AdamW(groups, weight_decay=0.05)
-        steps = epochs * len(dl_train)
-        sched = cosine_warmup(opt, steps, warmup_epochs * len(dl_train))
+        sched = cosine_warmup(opt, epochs * len(dl_train), warmup_epochs * len(dl_train))
         params = [p for g in groups for p in g["params"]]
         best_loss, bad = float("inf"), 0
         for ep in range(1, epochs + 1):
@@ -129,7 +119,8 @@ def main():
                 model.backbone.eval()
             tl = tc = tn = 0
             for x, y in dl_train:
-                x, y = x.to(dev, non_blocking=True).to(memory_format=torch.channels_last), y.to(dev, non_blocking=True)
+                x = gpu_augment(x.to(dev, non_blocking=True), True).to(memory_format=CL)
+                y = y.to(dev, non_blocking=True)
                 with torch.autocast("cuda", dtype=torch.bfloat16):
                     if stage == "head":
                         with torch.no_grad():
@@ -146,20 +137,21 @@ def main():
                 tl += loss.item() * len(y)
                 tc += (logits.argmax(1) == y).sum().item()
                 tn += len(y)
-            vl, v1, v5 = evaluate(model, dl_val, dev)
-            _, c1, _ = evaluate(model, dl_clean, dev)
-            gap = (c1 - v1) * 100
+            lo, _, yy = predict(model, dl_eval, dev)
+            vl, v1, v5 = metrics(lo[:nv], yy[:nv])
+            _, c1, _ = metrics(lo[nv:], yy[nv:])
+            gap = (tc / tn - v1) * 100
             rec = {"stage": stage, "epoch": ep, "train_loss": tl / tn, "train_top1_aug": tc / tn,
                    "train_top1_clean": c1, "val_loss": vl, "val_top1": v1, "val_top5": v5,
-                   "gap_points": gap, "lr": opt.param_groups[0]["lr"], "sec": time.time() - t0}
+                   "gap_points": gap, "gap_clean_points": (c1 - v1) * 100,
+                   "lr": opt.param_groups[0]["lr"], "sec": time.time() - t0}
             history.append(rec)
             print(json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in rec.items()}), flush=True)
             (out_dir / "history.json").write_text(json.dumps(history, indent=1))
             if v1 > best["val_top1"]:
                 best = {"val_top1": v1, "val_top5": v5, "val_loss": vl, "stage": stage, "epoch": ep}
                 torch.save({"state_dict": {k: v.half() for k, v in model.state_dict().items()},
-                            "class_names": names, "img_size": CLS_IMG_SIZE, "best": best},
-                           out_dir / "best.pt")
+                            "class_names": names, "img_size": CLS_IMG_SIZE, "best": best}, out_dir / "best.pt")
             if gap > args.max_gap:
                 print(f"STOP: train-val gap {gap:.1f} points > {args.max_gap}. Best checkpoint kept.", flush=True)
                 return "gap"
@@ -184,8 +176,10 @@ def main():
     ck = torch.load(out_dir / "best.pt", map_location="cpu", weights_only=False)
     model.load_state_dict({k: v.float() for k, v in ck["state_dict"].items()})
     (MODELS_DIR / "classifier.pt").write_bytes((out_dir / "best.pt").read_bytes())
-    dump_outputs(model, train_recs, dev, 64, args.workers, FEAT_DIR / "cnn_train.npz")
-    dump_outputs(model, val_recs, dev, 64, args.workers, FEAT_DIR / "cnn_val.npz")
+    for split, recs in (("train", train_recs), ("val", val_recs)):
+        lo, fe, yy = predict(model, loader(recs, False, 64, args.workers, persistent=False), dev)
+        np.savez_compressed(FEAT_DIR / f"cnn_{split}.npz", logits=lo.cpu().numpy(),
+                            feats=fe.cpu().numpy().astype(np.float16), labels=yy.cpu().numpy())
     print("DONE", flush=True)
 
 

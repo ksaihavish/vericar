@@ -45,7 +45,8 @@ def features_for(split: str, jobs: int = 8) -> tuple[np.ndarray, np.ndarray]:
     return X, y
 
 
-def svm(C=10.0, n_pca=256):
+def svm(C=10.0, n_pca=256, n_features=None):
+    n_pca = min(n_pca, n_features - 1) if n_features else n_pca
     return make_pipeline(StandardScaler(), PCA(n_pca, whiten=True, random_state=SEED),
                          SVC(C=C, kernel="rbf", gamma="scale", probability=True, random_state=SEED))
 
@@ -59,7 +60,7 @@ def main():
     candidates = {
         "SVM-RBF C=3": svm(3.0), "SVM-RBF C=10": svm(10.0),
         "RandomForest-500": make_pipeline(StandardScaler(), PCA(256, random_state=SEED),
-                                          RandomForestClassifier(500, n_jobs=-1, random_state=SEED)),
+                                          RandomForestClassifier(500, n_jobs=4, random_state=SEED)),
     }
     scores, fitted = {}, {}
     for name, model in candidates.items():
@@ -78,7 +79,7 @@ def main():
     for g, sl in groups.items():
         keep = np.ones(Xtr.shape[1], bool)
         keep[sl] = False
-        m = svm(base[-1].C) if "SVM" in best_name else candidates[best_name]
+        m = svm(base[-1].C, n_features=int(keep.sum())) if "SVM" in best_name else candidates[best_name]
         m.fit(Xtr[:, keep], ytr)
         ablation[f"without {g}"] = topk_accuracy(m.predict_proba(Xva[:, keep]), yva)
         print("ablation", g, ablation[f"without {g}"], flush=True)

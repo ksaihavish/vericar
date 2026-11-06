@@ -22,7 +22,7 @@ from .classifier import Classifier, preprocess
 from .config import CACHE_MAX_SIDE, CROP_MARGIN, MODELS_DIR
 from .data import Hierarchy
 from .detector import Detector
-from .hybrid import KnnOOD, Thresholds, fuse, identify, softmax, top_candidates, verify
+from .hybrid import KnnOOD, Thresholds, educated_guess, fuse, identify, softmax, top_candidates, verify
 from .preprocessing import adaptive_enhance, crop_box, load_rgb, quality_report, resize_max
 
 STATUS_COLOURS = {  # RGB
@@ -117,6 +117,7 @@ class VeriCar:
             "verdict": verdict.as_dict(),
             "quality": q.as_dict(), "enhancement": steps,
             "ood_score": ood_score, "ood_threshold": self.ood.threshold, "unknown": bool(unknown),
+            "guess": educated_guess(p_hybrid, self.hier),
             "methods": {
                 "classical": top_candidates(p_classical, self.hier, 5),
                 "deep": top_candidates(p_deep, self.hier, 5),
