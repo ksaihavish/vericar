@@ -38,6 +38,14 @@ The launcher creates a Python 3.12 virtual environment, installs `requirements.t
 
 ## Reproduce training and evaluation
 
+All steps in order with logging (`VERICAR_WORK/runs/*.log`):
+
+```bash
+python scripts/run_all.py
+```
+
+Or one by one:
+
 ```bash
 pip install -r requirements-train.txt          # plus a CUDA build of torch
 python scripts/prepare_data.py                 # download, verify test labels, cache, 85/15 split (seed 42)

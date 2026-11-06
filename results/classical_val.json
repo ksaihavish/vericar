@@ -1,0 +1,44 @@
+{
+ "model_selection_val": {
+  "SVM-RBF C=3": {
+   "top1": 0.2127659574468085,
+   "top5": 0.41734860883797054,
+   "fit_sec": 57.1
+  },
+  "SVM-RBF C=10": {
+   "top1": 0.2127659574468085,
+   "top5": 0.41734860883797054,
+   "fit_sec": 64.6
+  },
+  "RandomForest-500": {
+   "top1": 0.09328968903436989,
+   "top5": 0.20867430441898527,
+   "fit_sec": 460.0
+  }
+ },
+ "selected": "SVM-RBF C=3",
+ "feature_dims": {
+  "hog": 3780,
+  "texture": 60,
+  "colour": 38,
+  "geometry": 35
+ },
+ "feature_family_ablation_val": {
+  "without hog": {
+   "top1": 0.08346972176759411,
+   "top5": 0.2144026186579378
+  },
+  "without texture": {
+   "top1": 0.20049099836333878,
+   "top5": 0.40916530278232405
+  },
+  "without colour": {
+   "top1": 0.20212765957446807,
+   "top5": 0.41080196399345337
+  },
+  "without geometry": {
+   "top1": 0.20949263502454993,
+   "top5": 0.4165302782324059
+  }
+ }
+}

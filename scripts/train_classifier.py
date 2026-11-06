@@ -86,6 +86,8 @@ def main():
     ap.add_argument("--lr-head", type=float, default=5e-4)
     ap.add_argument("--lr-top", type=float, default=1.2e-4)
     ap.add_argument("--max-gap", type=float, default=10.0, help="stop if epoch train top-1 minus val top-1 > this (points)")
+    ap.add_argument("--resume-head", action="store_true",
+                    help="reuse a finished head-only stage (runs/classifier/best.pt + history.json) and start stage 2")
     args = ap.parse_args()
 
     seed_all(SEED)
@@ -164,7 +166,17 @@ def main():
                     return "early_stop"
         return "max_epochs"
 
-    r1 = run_stage("head", args.head_epochs, [{"params": list(model.fc.parameters()), "lr": 2e-3}], 0)
+    prev = json.loads((out_dir / "history.json").read_text()) if (out_dir / "history.json").exists() else []
+    head_done = [h for h in prev if h["stage"] == "head"]
+    if args.resume_head and len(head_done) == args.head_epochs and (out_dir / "best.pt").exists():
+        ck = torch.load(out_dir / "best.pt", map_location="cpu", weights_only=False)
+        model.load_state_dict({k: v.float() for k, v in ck["state_dict"].items()})
+        history.extend(head_done)
+        best = ck["best"]
+        r1 = "max_epochs (resumed)"
+        print(f"resumed head stage: val top-1 {best['val_top1']:.4f}", flush=True)
+    else:
+        r1 = run_stage("head", args.head_epochs, [{"params": list(model.fc.parameters()), "lr": 2e-3}], 0)
     set_trainable(model, "top")
     r2 = run_stage("top", args.max_epochs, param_groups(model, args.lr_head, args.lr_top), 1) if r1 != "gap" else "skipped"
 
