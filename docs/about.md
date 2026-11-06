@@ -8,7 +8,7 @@ A **cloned plate** is a real registration number copied onto a different car, us
 2. **Check the photo.** Brightness, contrast, sharpness and crop size are measured classically. Dark or flat crops get gamma + CLAHE; unusable ones become **RETAKE** instead of a guess.
 3. **Recognise.** ConvNeXt-Tiny (ImageNet-22k pre-trained, fine-tuned in two stages) scores all 196 classes; probabilities are temperature-calibrated on the validation split and fused with a classical HOG/LBP/colour/geometry SVM using a validation-fitted weight.
 4. **Know what it doesn't know.** If the car's embedding is far from every training car (k-nearest-neighbour distance), the answer is **UNKNOWN**: an honest "not in my 196 models", followed by an educated guess at make and body type.
-5. **Verify the claim, level by level.** Class probabilities are summed into make → model → year. Only a confident exact match is **MATCH**; a verified model with an unseparable year is **PARTIAL**; strong evidence against the claim is **MISMATCH**; everything else is **INSPECT**.
+5. **Verify the claim, level by level.** Class probabilities are summed into make → model → year. Only a claim that is the model's top prediction *and* clears the validation-fitted confidence bar is **MATCH**; a verified model with an unseparable year is **PARTIAL**; strong evidence against the claim is **MISMATCH**; everything else is **INSPECT**.
 
 **Strict by design.** Letting a cloned car drive away costs more than a two-minute manual check, so the MATCH threshold was chosen on the validation split so that at most 5% of *hard* clones (the most similar-looking other model) get cleared. The price is a higher false-alarm rate, which is reported next to the catch rate on the Results tab.
 

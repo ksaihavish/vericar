@@ -117,7 +117,8 @@ def claim_sets(labels: np.ndarray, hard: np.ndarray, easy: np.ndarray) -> dict[s
 def cleared_rate(probs, claims, unknown, flagged, t: float) -> float:
     """Fraction of claims that get MATCH (cleared) at threshold t (vectorised fast path)."""
     p = probs[np.arange(len(claims)), claims]
-    return float(((p >= t) & ~unknown & ~flagged).mean())
+    top = probs.argmax(1) == claims
+    return float(((p >= t) & top & ~unknown & ~flagged).mean())
 
 
 def clone_study(probs, labels, unknown, flagged, hier, thr, hard, easy) -> dict:

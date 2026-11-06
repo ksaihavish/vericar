@@ -32,6 +32,7 @@ OOD_K = 10
 HARD_CLONE_MAX_MATCH = 0.05
 LEGIT_MAX_MISMATCH = 0.01
 IDENTIFY_TARGET_ACC = 0.95
+MODEL_VERIFIED = 0.80
 
 
 def nll(p, y):
@@ -83,7 +84,7 @@ def main():
     # 4. strict verification thresholds
     claims = claim_sets(y, hard, easy)
     sweep = []
-    for t in np.round(np.arange(0.30, 0.991, 0.01), 2):
+    for t in np.round(np.arange(0.20, 0.991, 0.01), 2):
         sweep.append({"t": float(t), **{k: cleared_rate(p, c, unknown, flagged, t) for k, c in claims.items()}})
     ok = [s for s in sweep if s["hard_clone"] <= HARD_CLONE_MAX_MATCH]
     t_match = ok[0]["t"] if ok else 0.99
@@ -96,7 +97,8 @@ def main():
     t_id = next((float(t) for t in np.round(np.arange(0.2, 0.96, 0.01), 2)
                  if correct[conf >= t].mean() >= IDENTIFY_TARGET_ACC), 0.9)
 
-    thr = Thresholds(match=t_match, model=t_match, mismatch=float(t_mis), identify=t_id)
+    # PARTIAL ("make and model verified, year not") needs a confident model family: fixed at 0.80
+    thr = Thresholds(match=t_match, model=MODEL_VERIFIED, mismatch=float(t_mis), identify=t_id)
     study = clone_study(p, y, unknown, flagged, hier, thr, hard, easy)
     print("thresholds", thr.as_dict(), flush=True)
     print("val clone study", json.dumps({k: study[k] for k in ("false_alarm_rate", "catch_rate_hard", "catch_rate_easy")}), flush=True)

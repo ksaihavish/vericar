@@ -167,7 +167,7 @@ class Classifier:
     def predict(self, x: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         if self.onnx is not None:
             logits, feats = self.onnx.run(None, {self.input_name: x.astype(np.float32)})
-            return logits, feats
+            return logits.astype(np.float32), feats.astype(np.float32)
         import torch
         with torch.inference_mode():
             logits, feats = self._load_torch()(torch.from_numpy(x))

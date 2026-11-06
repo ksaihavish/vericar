@@ -133,7 +133,7 @@ def verify(probs: np.ndarray, claim: int, hier: Hierarchy, thr: Thresholds,
         return Verdict("UNKNOWN", "Cannot verify - car not in my knowledge",
                        f"This car does not resemble any of the 196 models I was trained on. Educated guess: "
                        f"{g['make']} ({g['make_prob']:.0%}), body {g['body']}. Manual check required.", levels, cands)
-    if p_exact >= thr.match:
+    if p_exact >= thr.match and int(np.argmax(probs)) == claim:   # never clear a claim that is not the top guess
         return Verdict("MATCH", "Match - registration verified",
                        f"The photo matches {claimed['label']} ({p_exact:.0%}).", levels, cands)
     if p_model >= thr.model:

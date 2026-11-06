@@ -70,7 +70,7 @@ ConvNeXt-Tiny (`convnext_tiny.fb_in22k_ft_in1k`), 384×384 input, dropout 0.4 he
 4. ConvNeXt logits → **temperature scaling** (T fitted on validation).
 5. **Log-linear fusion** with the classical SVM probabilities (weight w fitted on validation NLL; w = 0 is allowed and would be reported honestly).
 6. **Unknown-car check:** cosine kNN distance (k = 10) of the 768-d embedding to the training embeddings; threshold = 95th percentile on validation.
-7. **Verification:** probabilities summed into make, model family and year. MATCH needs P(claimed class) ≥ τ, where τ is the lowest threshold with ≤ 5% hard clones cleared on validation. PARTIAL = model verified but year not. MISMATCH = P(claimed model family) below a threshold that keeps legitimate MISMATCHes ≤ 1% on validation. Anything else is INSPECT.
+7. **Verification:** probabilities summed into make, model family and year. MATCH needs the claimed class to be the **top-1 prediction** *and* calibrated P(claimed class) ≥ τ, where τ is the lowest threshold with ≤ 5% hard clones cleared on validation. PARTIAL = claimed model family ≥ 0.80 but the year not verified. MISMATCH = P(claimed model family) below a threshold that keeps legitimate MISMATCHes ≤ 1% on validation. Anything else is INSPECT.
 
 ### 5.5 Explainability
 Grad-CAM from the last ConvNeXt stage; look-alike candidates shown next to the most typical training image of each class (nearest to the class prototype in embedding space); every classical intermediate (edges, contours, ROI, HOG, LBP, colour histograms); and an optional Gemini officer note generated **only** from the structured verdict.

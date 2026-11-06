@@ -24,7 +24,8 @@ def export_onnx(model, path: Path, img_size: int) -> Path:
 def to_fp16(src: Path, dst: Path) -> Path:
     import onnx
     from onnxconverter_common import float16
-    m = float16.convert_float_to_float16(onnx.load(str(src)), keep_io_types=True)
+    # the head Gemm reads the float32 'features' graph output -> keep that node in FP32
+    m = float16.convert_float_to_float16(onnx.load(str(src)), keep_io_types=True, node_block_list=["/fc/Gemm"])
     onnx.save(m, str(dst))
     return dst
 
