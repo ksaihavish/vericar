@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.streamlit/secrets.toml
+.ipynb_checkpoints/
+.pytest_cache/
+.DS_Store
+
+# heavy artefacts: models are downloaded by scripts/download_models.py
+models/*
+!models/README.md
+*.pt
+*.onnx
+*.joblib
+*.npy
+*.npz
+runs/
+data/
