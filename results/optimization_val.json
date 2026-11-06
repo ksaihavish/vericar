@@ -1,0 +1,42 @@
+{
+ "rows": {
+  "onnx_fp32": {
+   "size_mb": 112.0,
+   "median_ms": 346.0,
+   "top1": 0.935,
+   "top5": 0.99,
+   "acc_n": 400
+  },
+  "onnx_fp16": {
+   "size_mb": 56.4,
+   "median_ms": 400.0,
+   "top1": 0.935,
+   "top5": 0.99,
+   "acc_n": 400
+  },
+  "onnx_int8_dynamic": {
+   "size_mb": 28.4,
+   "median_ms": 348.1,
+   "top1": 0.9275,
+   "top5": 0.995,
+   "acc_n": 400
+  },
+  "onnx_int8_static": {
+   "size_mb": 28.7,
+   "median_ms": 85.1,
+   "top1": 0.85,
+   "top5": 0.985,
+   "acc_n": 400
+  }
+ },
+ "chosen": "onnx_fp32",
+ "rule": "fastest variant with val top-1 >= ONNX FP32 - 0.005",
+ "latency_threads": 2,
+ "accuracy_split": "fixed seeded 400-image validation subset (ground-truth crops)",
+ "notes": [
+  "Latency: median single-image CPU time, ONNX Runtime limited to 2 threads (free-host proxy), idle machine.",
+  "Static INT8 (min-max calibration on 128 train crops) is 4x faster but loses 8.5 points: ConvNeXt activations after LayerNorm/GELU have outliers that min-max calibration clips. Percentile calibration / keeping LayerNorm in FP32 is future work.",
+  "Dynamic INT8 quarters the size but gives no speed-up on this CPU (integer depthwise kernels).",
+  "FP16 halves the size with identical accuracy but is slightly slower on CPUs without native FP16 math."
+ ]
+}

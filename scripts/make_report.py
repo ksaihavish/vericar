@@ -65,9 +65,13 @@ def main():
               f"validation ground-truth crops. Shipped variant: **{O['chosen']}** ({O['rule']}).", "",
               table(["Variant", "Size (MB)", "Latency (ms)", "Val Top-1"],
                     [[k, f"{v['size_mb']:.1f}", f"{v['median_ms']:.0f}", pct(v.get("top1"))] for k, v in O["rows"].items()]), ""]
-    if "latency" in F:
-        L += ["End-to-end `analyze()` timings on CPU (median over test images, ms):", "",
-              table(["Stage", "ms"], [[k, f"{v:.0f}"] for k, v in F["latency"].items()]), ""]
+    lat = j("latency_deployed.json")
+    if lat:
+        L += [f"End-to-end deployed pipeline (`VeriCar.analyze`, ONNX FP32 classifier, YOLO on CPU), median over "
+              f"{lat['n']} test images, ms:", "",
+              table(["Stage", "ms"], [[k, f"{v:.0f}"] for k, v in lat["median_ms"].items()]), ""]
+    if O.get("notes"):
+        L += ["Notes:", ""] + [f"- {n}" for n in O["notes"]] + [""]
 
     L += ["## 5. Robustness (performance under varying conditions)", "",
           table(["Condition", "Classical", "Deep", "Hybrid", "Hybrid RETAKE rate", "Box IoU"],

@@ -1,0 +1,12 @@
+{
+ "pipeline": "VeriCar.analyze with intermediates, ONNX FP32 classifier, YOLO on CPU",
+ "median_ms": {
+  "load": 4.1,
+  "detect": 68.65,
+  "classical": 21.5,
+  "deep": 96.44999999999999,
+  "hybrid": 7.1,
+  "total": 201.85
+ },
+ "n": 20
+}
