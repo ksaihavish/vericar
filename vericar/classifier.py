@@ -15,7 +15,10 @@ import numpy as np
 from .config import CLS_IMG_SIZE, CROP_MARGIN, IMAGENET_MEAN, IMAGENET_STD
 from .preprocessing import crop_box, normalize_for_model
 
+import threading
+
 MODEL_NAME = "convnext_tiny.fb_in22k_ft_in1k"
+_CAM_LOCK = threading.Lock()
 TOP_STAGES = ("stages.2", "stages.3", "head")   # unfrozen in stage 2 (head = final norm)
 
 
@@ -149,6 +152,7 @@ class Classifier:
             import onnxruntime as ort
             so = ort.SessionOptions()
             so.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            so.enable_cpu_mem_arena = False          # lower resident memory on small hosts
             self.onnx = ort.InferenceSession(str(onnx_path), so, providers=["CPUExecutionProvider"])
             self.input_name = self.onnx.get_inputs()[0].name
         self.torch_path = torch_path
@@ -174,9 +178,16 @@ class Classifier:
         return logits.numpy(), feats.numpy()
 
     def gradcam(self, x: np.ndarray, class_idx: int) -> np.ndarray:
-        """Grad-CAM heat-map (H x W in [0,1]) from the last ConvNeXt stage."""
+        """Grad-CAM heat-map (H x W in [0,1]) from the last ConvNeXt stage (one at a time: ~0.5 GB peak)."""
+        with _CAM_LOCK:
+            return self._gradcam(x, class_idx)
+
+    def _gradcam(self, x: np.ndarray, class_idx: int) -> np.ndarray:
+        import gc
+
         import torch
         import torch.nn.functional as F
+        torch.set_num_threads(2)
         model = self._load_torch()
         store = {}
 
@@ -196,4 +207,6 @@ class Classifier:
         cam = F.relu((grad.mean(dim=(1, 2), keepdim=True) * act).sum(0))
         cam = F.interpolate(cam[None, None], size=x.shape[-2:], mode="bilinear", align_corners=False)[0, 0]
         cam = cam.detach().numpy()
+        del store, logits, xt
+        gc.collect()
         return (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)

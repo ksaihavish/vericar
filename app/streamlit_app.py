@@ -49,10 +49,11 @@ def demo_items() -> list[dict]:
     return json.loads(p.read_text()) if p.exists() else []
 
 
-@st.cache_data(max_entries=48, show_spinner=False)
-def analyze_cached(image_bytes: bytes, claim) -> dict:
-    """Streamlit re-runs the script on every click; the models run once per (photo, claim)."""
-    return engine().analyze(Image.open(io.BytesIO(image_bytes)), claim=claim, gradcam=True)
+@st.cache_data(max_entries=8, show_spinner=False)
+def analyze_cached(image_bytes: bytes, claim, gradcam: bool = False) -> dict:
+    """Streamlit re-runs the script on every click; the models run once per (photo, claim).
+    Small cache + Grad-CAM on demand keep memory inside a free host's limit."""
+    return engine().analyze(Image.open(io.BytesIO(image_bytes)), claim=claim, gradcam=gradcam)
 
 
 @st.cache_data(max_entries=96, show_spinner=False)
@@ -190,10 +191,19 @@ with tab_check:
                              f'unverified</span>{ui.esc(op)}</div>')
 
             html(ui.section("4", "Evidence", f"{res['timings_ms']['total']:.0f} ms"))
+            key = f"{hashlib.sha1(image_bytes).hexdigest()}|{claim}"
+            if st.session_state.get("cam_for") == key:
+                with st.spinner("Computing where the model looked…"):
+                    res = analyze_cached(image_bytes, claim, True)
             a, b = st.columns([1.5, 1])
             a.image(res["images"]["annotated"], width="stretch", alt="Photo with the detected vehicle boxed and labelled",
                     caption=f"Detected vehicle ({res['box_source']}, score {res['det_score']:.2f})")
-            if "gradcam" in res["images"]:
+            if "gradcam" not in res["images"]:
+                b.button("Show where the model looked (Grad-CAM)", width="stretch",
+                         on_click=lambda k=key: st.session_state.update(cam_for=k))
+                b.markdown('<div class="vc-cap">Highlights the image regions that drove the prediction. ' 
+                           'Takes a few seconds on the free server.</div>', unsafe_allow_html=True)
+            else:
                 b.image(res["images"]["gradcam"], width="stretch", caption="Where the model looked (Grad-CAM)", alt="Grad-CAM heat map over the car")
             html('<div class="vc-cap" style="margin:.8rem 0 .4rem">LOOK-ALIKES: the most typical training photo '
                  'of each top candidate</div>')

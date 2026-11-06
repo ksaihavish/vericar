@@ -164,7 +164,9 @@ def annotate(img, box, status, label, prob, classical_box=None) -> np.ndarray:
     col = STATUS_COLOURS.get(status, (59, 130, 246))
     x1, y1, x2, y2 = map(int, box)
     cv2.rectangle(out, (x1, y1), (x2, y2), col, th, cv2.LINE_AA)
-    text = f"{label}  {prob:.0%}"
+    # never print a 196-class name on a car the system has flagged as unknown or too uncertain
+    text = {"UNKNOWN": "Not in records", "RETAKE": "Retake photo",
+            "LOW_CONFIDENCE": f"Unsure ({prob:.0%})"}.get(status, f"{label}  {prob:.0%}")
     fs = max(0.45, max(h, w) / 1100)
     (tw, tht), base = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, fs, max(1, th - 1))
     ty = y1 - 6 if y1 - tht - 10 > 0 else y1 + tht + 10
