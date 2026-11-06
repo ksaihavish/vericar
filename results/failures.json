@@ -1,0 +1,112 @@
+[
+ {
+  "key": "year_confusion",
+  "title": "Same model, wrong year",
+  "true": "Honda Odyssey Minivan 2007",
+  "pred": "Honda Odyssey Minivan 2012",
+  "conf": 0.9995742440223694,
+  "det_iou": 0.9644393780859264,
+  "top3": [
+   "Honda Odyssey Minivan 2012",
+   "Honda Odyssey Minivan 2007",
+   "Lamborghini Reventon Coupe 2008"
+  ],
+  "image": "year_confusion.png",
+  "quality": {
+   "brightness": 160.5,
+   "contrast": 88.1,
+   "sharpness": 1496.7,
+   "min_side": 243,
+   "issues": []
+  },
+  "explanation": "**Cause: year-level look-alikes, and possibly a dataset label error.** The photo shows the 2011+ Odyssey design (the stepped 'lightning-bolt' window line), which is exactly what the 2012 reference shows; the 2007 reference has a straight beltline. Either the image is mislabelled in Stanford Cars or the year cue is too subtle. Grad-CAM spreads over the wheels and rear window line, i.e. the body shape. **What VeriCar does:** for a claim of a 2007 Odyssey this becomes PARTIAL/MISMATCH, so the officer checks documents."
+ },
+ {
+  "key": "confident_wrong_make",
+  "title": "Confident, wrong make",
+  "true": "Dodge Durango SUV 2007",
+  "pred": "Chrysler Aspen SUV 2009",
+  "conf": 0.9982624650001526,
+  "det_iou": 0.9685820703200103,
+  "top3": [
+   "Chrysler Aspen SUV 2009",
+   "Dodge Durango SUV 2007",
+   "Infiniti QX56 SUV 2011"
+  ],
+  "image": "confident_wrong_make.png",
+  "quality": {
+   "brightness": 115.7,
+   "contrast": 58.4,
+   "sharpness": 856.7,
+   "min_side": 254,
+   "issues": []
+  },
+  "explanation": "**Cause: badge engineering.** The Chrysler Aspen is a rebadged Dodge Durango: same body, doors, glasshouse and wheels. In a pure side view the only distinguishing part (the grille) is hidden, so even a 100%-confident model has nothing to separate them; Grad-CAM sits on the shared rear quarter and C-pillar. **Lesson:** confidence is not identity for twin vehicles; a front-view photo is needed. This pair is a natural 'hard clone' case for our verification study."
+ },
+ {
+  "key": "bad_localisation",
+  "title": "Detector boxed the wrong region",
+  "true": "Aston Martin V8 Vantage Convertible 2012",
+  "pred": "FIAT 500 Convertible 2012",
+  "conf": 0.2669321596622467,
+  "det_iou": 0.0,
+  "top3": [
+   "FIAT 500 Convertible 2012",
+   "Suzuki SX4 Hatchback 2012",
+   "Hyundai Veloster Hatchback 2012"
+  ],
+  "image": "bad_localisation.png",
+  "quality": {
+   "brightness": 79.3,
+   "contrast": 31.5,
+   "sharpness": 94.1,
+   "min_side": 221,
+   "issues": []
+  },
+  "explanation": "**Cause: unusual viewpoint + wrong ROI.** An aerial, top-down shot with motion blur; Stanford Cars training images are almost all ground-level side / three-quarter views. The detector's box (red) covers mostly road, so the crop the classifier sees is a tall strip that gets squashed to a square. Confidence is only 27%, and re-running the full app pipeline even returns a different class, so the prediction is unstable. **What VeriCar does:** low confidence means LOW_CONFIDENCE / INSPECT, never MATCH."
+ },
+ {
+  "key": "dark_image",
+  "title": "Low light",
+  "true": "Rolls-Royce Phantom Sedan 2012",
+  "pred": "Rolls-Royce Ghost Sedan 2012",
+  "conf": 0.4340892434120178,
+  "det_iou": 0.7264326117130722,
+  "top3": [
+   "Rolls-Royce Ghost Sedan 2012",
+   "Rolls-Royce Phantom Drophead Coupe Convertible 2012",
+   "Rolls-Royce Phantom Sedan 2012"
+  ],
+  "image": "dark_image.png",
+  "quality": {
+   "brightness": 59.3,
+   "contrast": 50.4,
+   "sharpness": 956.3,
+   "min_side": 182,
+   "issues": []
+  },
+  "explanation": "**Cause: same-make look-alikes under poor light and occlusion.** Rolls-Royce Phantom and Ghost share the grille, lamps and proportions; at night with glare and a person standing in the open door, the side profile (the main difference) is hidden. Grad-CAM focuses on the grille, which both models share. Confidence is 43%. **What VeriCar does:** below the MATCH bar the verdict is INSPECT, and the make level (Rolls-Royce) is still verified."
+ },
+ {
+  "key": "truncated_or_occluded",
+  "title": "Car cut off by the frame",
+  "true": "Audi S5 Convertible 2012",
+  "pred": "BMW 1 Series Convertible 2012",
+  "conf": 0.21859118342399597,
+  "det_iou": 0.9811254504181376,
+  "top3": [
+   "BMW 1 Series Convertible 2012",
+   "Audi RS 4 Convertible 2008",
+   "Ford Mustang Convertible 2007"
+  ],
+  "image": "truncated_or_occluded.png",
+  "quality": {
+   "brightness": 129.8,
+   "contrast": 67.2,
+   "sharpness": 802.8,
+   "min_side": 101,
+   "issues": []
+  },
+  "explanation": "**Cause: truncated side view.** Both bumpers are cut off by the frame, so the grille and lamps that separate Audi from BMW are missing; Grad-CAM attends to the soft top and windscreen frame, which look alike across small convertibles. Confidence is only 22%. **What VeriCar does:** LOW_CONFIDENCE in identify mode (top-3 shown) and INSPECT for a verification claim."
+ }
+]

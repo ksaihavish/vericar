@@ -50,7 +50,7 @@ The rubric gives 25 points to the demo and viva: *"every member can explain thei
 **Likely questions**
 - *Why is classical accuracy so low?* 196 classes that differ by grille and lamp details. Global descriptors capture shape and texture but not those part-level cues. That's why it's honest to show it, and why it's used for quality, ROI and robustness rather than as the main classifier.
 - *Which classical features matter?* The feature-family ablation: removing HOG drops validation top-1 from 21.3% to 8.3%, while removing colour barely matters (a model's paint colour varies, so colour says little about the model).
-- *Where does classical help the hybrid?* See the ablation and robustness tables. Adaptive enhancement matters most under dark conditions, and the quality gate turns hopeless inputs into RETAKE instead of confident mistakes.
+- *Where does classical help the hybrid?* Be honest, because the numbers are honest. The validation-fitted fusion weight came out 0, so the classical SVM doesn't change the label. Classical CV does the ROI fallback, the quality gate (it turns very blurry or tiny inputs into RETAKE instead of confident mistakes) and the contour detector (mAP@0.5 0.64 with no learning). Adaptive gamma + CLAHE actually *hurt* on very dark photos (90.4% vs 93.5%), because the CNN's brightness augmentation already copes with darkness. That's a real finding, and we report it.
 
 ## 4. UI design
 

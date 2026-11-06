@@ -6,7 +6,7 @@ A **cloned plate** is a real registration number copied onto a different car, us
 
 1. **Find the car.** YOLO11n (fine-tuned on Stanford Cars boxes) draws the box. If it finds nothing, a purely classical edge-and-contour detector takes over and the result is marked *retake*.
 2. **Check the photo.** Brightness, contrast, sharpness and crop size are measured classically. Dark or flat crops get gamma + CLAHE; unusable ones become **RETAKE** instead of a guess.
-3. **Recognise.** ConvNeXt-Tiny (ImageNet-22k pre-trained, fine-tuned in two stages) scores all 196 classes; probabilities are temperature-calibrated on the validation split and fused with a classical HOG/LBP/colour/geometry SVM using a validation-fitted weight.
+3. **Recognise.** ConvNeXt-Tiny (ImageNet-22k pre-trained, fine-tuned in two stages) scores all 196 classes; probabilities are temperature-calibrated on the validation split. A classical HOG/LBP/colour/geometry SVM is fused in with a validation-fitted weight; that weight came out as 0 (the classical vote didn't improve validation likelihood), and we report that rather than force it.
 4. **Know what it doesn't know.** If the car's embedding is far from every training car (k-nearest-neighbour distance), the answer is **UNKNOWN**: an honest "not in my 196 models", followed by an educated guess at make and body type.
 5. **Verify the claim, level by level.** Class probabilities are summed into make → model → year. Only a claim that is the model's top prediction *and* clears the validation-fitted confidence bar is **MATCH**; a verified model with an unseparable year is **PARTIAL**; strong evidence against the claim is **MISMATCH**; everything else is **INSPECT**.
 

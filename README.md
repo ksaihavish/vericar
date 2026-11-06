@@ -11,7 +11,28 @@ Cloned plates are usually put on a car that looks like the registered one, so th
 - shows **why**: competing look-alike classes side by side, Grad-CAM, and every classical intermediate step,
 - says **"not in my knowledge"** for cars outside the 196 training classes, then gives an educated guess at make and body type.
 
-> Status: under active development during the hackathon. Results, design doc and architecture diagram will land in `results/` and `docs/`.
+## Results (official test set, 8,041 images, evaluated once)
+
+| | Top-1 | Top-5 | Make acc. | ECE |
+|---|---|---|---|---|
+| Classical (contour ROI + HOG/LBP/GLCM/colour/geometry + SVM) | 5.7% | 15.3% | 14.9% | 0.004 |
+| Deep (YOLO11n crop → ConvNeXt-Tiny) | 93.4% | 99.2% | 97.8% | 0.145 |
+| **Hybrid (ours)** | **93.4%** | **99.2%** | **97.8%** | **0.012** |
+
+| Detector | mAP@0.5 | mAP@0.5:0.95 | Mean IoU |
+|---|---|---|---|
+| **YOLO11n fine-tuned (ours)** | **0.990** | **0.933** | **0.953** |
+| YOLO11n COCO-pretrained | 0.855 | 0.782 | 0.871 |
+| Classical edges + contours | 0.640 | 0.226 | 0.654 |
+
+**Claim verification (strict):** 98.3% of hard clones (the most similar other model) and 100% of easy clones are caught; the cost is 17.1% of legitimate cars sent to a manual check.
+
+**Honest notes**
+- The hybrid's top-1 equals deep-only. Its gains are a **12× better calibration** (ECE 0.145 → 0.012), which the strict verifier depends on (without it, false alarms rise to 42.6%), plus the quality gate and the unknown-car check.
+- The validation-fitted classical fusion weight came out **0**, so classical features don't change the hybrid's label. Classical CV contributes the ROI fallback, the quality gate and the adaptive enhancement. Enhancement *hurts* on very dark photos (90.4% vs 93.5%), and that is reported in the robustness table.
+- The classical-only pipeline falls to 5.7% on test because its own contour ROI is imprecise (21.3% on clean ground-truth crops in validation).
+
+Full tables (robustness, ablation, optimisation, confidence, failure cases) are in [`docs/eval_P5_<TeamID>.md`](docs/) and the app's Results tab. Design: [`docs/design.md`](docs/design.md) · architecture: [`docs/architecture.md`](docs/architecture.md) · viva prep: [`docs/viva_prep.md`](docs/viva_prep.md).
 
 ## Run it (one command)
 
