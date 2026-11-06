@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -35,8 +36,11 @@ def main() -> int:
             cmd += a.classifier_args.split()
         with open(plog, "a", encoding="utf-8") as f:
             f.write(f"{dt.datetime.now():%H:%M:%S} START {step}\n")
+        env = {**os.environ, "HF_HUB_DISABLE_SYMLINKS_WARNING": "1", "PYTHONWARNINGS": "ignore"}
         with open(RUNS_DIR / f"{step}.log", "w", encoding="utf-8") as out:
-            rc = subprocess.call(cmd, stdout=out, stderr=subprocess.STDOUT, cwd=ROOT)
+            # no console window: a closed window would kill a long training run
+            rc = subprocess.call(cmd, stdout=out, stderr=subprocess.STDOUT, cwd=ROOT, env=env,
+                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         with open(plog, "a", encoding="utf-8") as f:
             f.write(f"{dt.datetime.now():%H:%M:%S} END {step} rc={rc}\n")
         if rc != 0:

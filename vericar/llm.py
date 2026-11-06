@@ -9,13 +9,17 @@ from __future__ import annotations
 import json
 import os
 
-DEFAULT_MODELS = ("gemini-flash-latest", "gemini-2.5-flash")
+from pathlib import Path
+
+# 3.5-flash with thinking off answered in ~4 s in testing; 2.5-flash is the fallback.
+DEFAULT_MODELS = ("gemini-3.5-flash", "gemini-2.5-flash")
+TIMEOUT_MS = 15000
 
 
 def _key() -> str | None:
     try:
         from dotenv import load_dotenv
-        load_dotenv()
+        load_dotenv(Path(__file__).resolve().parents[1] / ".env")
     except Exception:
         pass
     key = os.environ.get("GEMINI_API_KEY")
@@ -32,24 +36,29 @@ def available() -> bool:
     return _key() is not None
 
 
-def _generate(contents, max_tokens: int = 220) -> str | None:
+def _generate(contents, max_tokens: int = 400) -> str | None:
     key = _key()
     if not key:
         return None
     try:
         from google import genai
         from google.genai import types
-        client = genai.Client(api_key=key)
+        client = genai.Client(api_key=key, http_options=types.HttpOptions(timeout=TIMEOUT_MS))
         models = [os.environ["GEMINI_MODEL"]] if os.environ.get("GEMINI_MODEL") else list(DEFAULT_MODELS)
+        no_think = types.ThinkingConfig(thinking_budget=0)
         for m in models:
-            try:
-                r = client.models.generate_content(
-                    model=m, contents=contents,
-                    config=types.GenerateContentConfig(temperature=0.2, max_output_tokens=max_tokens))
-                if r.text:
-                    return r.text.strip()
-            except Exception:
-                continue
+            for think in (no_think, None):   # thinking off is faster; some API versions reject the setting
+                try:
+                    # without the thinking switch, hidden reasoning shares the budget -> give it room
+                    r = client.models.generate_content(
+                        model=m, contents=contents,
+                        config=types.GenerateContentConfig(temperature=0.2, thinking_config=think,
+                                                           max_output_tokens=max_tokens if think else 4096))
+                    finished = "STOP" in str(r.candidates[0].finish_reason) if r.candidates else False
+                    if r.text and finished:          # never show a truncated note
+                        return r.text.strip()
+                except Exception:
+                    continue
     except Exception:
         return None
     return None
@@ -69,7 +78,7 @@ def officer_note(result: dict, claim_label: str | None) -> str | None:
               "registration. Use ONLY the facts in the JSON. Do not name any car model that is not in the "
               "JSON. Say what to do next (clear, check documents, or inspect). 2-3 plain sentences, no "
               "markdown.\n\n" + json.dumps(facts))
-    return _generate(prompt, 160)
+    return _generate(prompt, 400)
 
 
 def second_opinion(jpeg_bytes: bytes, guess: dict) -> str | None:
@@ -82,4 +91,4 @@ def second_opinion(jpeg_bytes: bytes, guess: dict) -> str | None:
               "(grille, headlights, body shape). Give your confidence (low/medium/high) and name 1-2 cues. "
               f"A separate classifier guessed make '{guess.get('make')}' and body '{guess.get('body')}'; "
               "agree or disagree. Max 3 short sentences, no markdown.")
-    return _generate([types.Part.from_bytes(data=jpeg_bytes, mime_type="image/jpeg"), prompt], 160)
+    return _generate([types.Part.from_bytes(data=jpeg_bytes, mime_type="image/jpeg"), prompt], 400)
