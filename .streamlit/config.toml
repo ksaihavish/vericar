@@ -1,11 +1,22 @@
+# All visual design lives here (Streamlit's own guidance: theme config over injected CSS).
 [theme]
 base = "light"
 primaryColor = "#1B1814"
 backgroundColor = "#F3F0E8"
 secondaryBackgroundColor = "#FBFAF6"
 textColor = "#1B1814"
-font = "sans serif"
+linkColor = "#1E3A8A"
 borderColor = "#DCD6C8"
+showWidgetBorder = true
+baseRadius = "0.4rem"
+buttonRadius = "0.3rem"
+font = "'Instrument Sans':https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap"
+headingFont = "'Instrument Serif':https://fonts.googleapis.com/css2?family=Instrument+Serif&display=swap"
+headingFontWeights = [400, 400, 400, 400, 400, 400]
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"
+metricValueFontWeight = 500
+chartCategoricalColors = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
+dataframeHeaderBackgroundColor = "#EDE8DD"
 
 [server]
 maxUploadSize = 15

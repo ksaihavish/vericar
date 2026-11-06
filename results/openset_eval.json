@@ -4,26 +4,26 @@
   "known": 196,
   "modern": 343
  },
- "tau_p_modern": 0.8316360551118847,
+ "tau_p_modern": 0.7069850218296037,
  "val_flag_rate": 0.030278232405891982,
- "val_zero_shot_top1_196": 0.5540098199672667,
+ "val_zero_shot_top1_196": 0.7757774140752864,
  "posthoc_probe": {
   "n": 25,
-  "flag_rate_clip": 0.6,
+  "flag_rate_clip": 0.96,
   "flag_rate_knn": 0.64,
-  "flag_rate_combined": 0.92,
-  "top1_modern_name_acc": 0.16,
+  "flag_rate_combined": 1.0,
+  "top1_modern_name_acc": 0.36,
   "top3_modern_name_acc": 0.52,
   "rows": [
    {
     "file": "Audi_Q4_e_tron_1.jpg",
     "truth": "Audi Q4 e-tron",
-    "p_modern": 0.9865097999572754,
+    "p_modern": 0.9999994039535522,
     "flag": true,
     "top3": [
-     "Mercedes-Benz EQE",
-     "Kia EV6",
-     "Toyota bZ4X"
+     "BMW iX",
+     "Skoda Enyaq",
+     "Mercedes-Benz EQE"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -31,25 +31,25 @@
    {
     "file": "Audi_Q4_e_tron_2.jpg",
     "truth": "Audi Q4 e-tron",
-    "p_modern": 0.9160311222076416,
+    "p_modern": 0.9999865293502808,
     "flag": true,
     "top3": [
-     "Volkswagen Arteon",
-     "Mercedes-Benz GLA (2020)",
-     "Audi Q4 e-tron"
+     "Citroen e-C4",
+     "Skoda Enyaq",
+     "Renault Megane E-Tech"
     ],
     "top1_correct": false,
-    "top3_correct": true
+    "top3_correct": false
    },
    {
     "file": "Ford_Mustang_Mach_E_1.jpg",
     "truth": "Ford Mustang Mach-E",
-    "p_modern": 0.9620732069015503,
+    "p_modern": 0.9999716281890869,
     "flag": true,
     "top3": [
-     "Volkswagen Virtus",
-     "Volkswagen Arteon",
-     "Kia EV6"
+     "BMW i7",
+     "BMW i4",
+     "Audi e-tron GT"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -57,11 +57,11 @@
    {
     "file": "Ford_Mustang_Mach_E_2.jpg",
     "truth": "Ford Mustang Mach-E",
-    "p_modern": 0.5931336879730225,
-    "flag": false,
+    "p_modern": 0.7302836179733276,
+    "flag": true,
     "top3": [
-     "Mahindra Thar (2020)",
      "Mercedes-Benz G-Class (2018)",
+     "Mahindra Thar (2020)",
      "Jeep Wrangler JL"
     ],
     "top1_correct": false,
@@ -70,12 +70,12 @@
    {
     "file": "Hyundai_Creta_SU2_1.jpg",
     "truth": "Hyundai Creta",
-    "p_modern": 0.9620363712310791,
+    "p_modern": 0.9991179704666138,
     "flag": true,
     "top3": [
      "Hyundai Creta (2020)",
-     "Toyota Urban Cruiser Hyryder",
-     "Toyota bZ4X"
+     "Mahindra XUV400",
+     "Mahindra XUV700"
     ],
     "top1_correct": true,
     "top3_correct": true
@@ -83,25 +83,25 @@
    {
     "file": "Hyundai_Creta_SU2_2.jpg",
     "truth": "Hyundai Creta",
-    "p_modern": 0.9961905479431152,
+    "p_modern": 0.9998860359191895,
     "flag": true,
     "top3": [
-     "Hyundai Creta (2020)",
-     "Tata Harrier",
-     "MG Hector"
+     "Mitsubishi Outlander (2022)",
+     "Mitsubishi Pajero Sport (2016)",
+     "Nissan Magnite"
     ],
-    "top1_correct": true,
-    "top3_correct": true
+    "top1_correct": false,
+    "top3_correct": false
    },
    {
     "file": "Hyundai_Ioniq_5_1.jpg",
     "truth": "Hyundai Ioniq 5",
-    "p_modern": 0.8735854625701904,
+    "p_modern": 0.9999879002571106,
     "flag": true,
     "top3": [
-     "Volkswagen Virtus",
-     "Volkswagen T-Roc",
-     "Skoda Enyaq"
+     "Skoda Enyaq",
+     "Lucid Air",
+     "Cadillac Lyriq"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -109,12 +109,12 @@
    {
     "file": "Hyundai_Ioniq_5_2.jpg",
     "truth": "Hyundai Ioniq 5",
-    "p_modern": 0.7447439432144165,
-    "flag": false,
+    "p_modern": 0.9998177289962769,
+    "flag": true,
     "top3": [
-     "Audi A4 B9",
-     "Polestar Polestar 2",
-     "Audi A8 D5"
+     "Volkswagen Virtus",
+     "Volkswagen ID.3",
+     "BMW i7"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -122,11 +122,11 @@
    {
     "file": "Kia_EV6_1.jpg",
     "truth": "Kia EV6",
-    "p_modern": 0.955833375453949,
+    "p_modern": 0.9999433159828186,
     "flag": true,
     "top3": [
-     "Polestar Polestar 2",
-     "Polestar Polestar 4",
+     "Volkswagen Arteon",
+     "BMW i7",
      "Kia EV6"
     ],
     "top1_correct": false,
@@ -135,24 +135,24 @@
    {
     "file": "Kia_EV6_2.jpg",
     "truth": "Kia EV6",
-    "p_modern": 0.9899066686630249,
+    "p_modern": 0.9999889731407166,
     "flag": true,
     "top3": [
-     "Polestar Polestar 2",
-     "Polestar Polestar 4",
-     "Volkswagen Virtus"
+     "Kia EV6",
+     "Citroen e-C4",
+     "Citroen Basalt"
     ],
-    "top1_correct": false,
-    "top3_correct": false
+    "top1_correct": true,
+    "top3_correct": true
    },
    {
     "file": "Mahindra_XUV700_1.jpg",
     "truth": "Mahindra XUV700",
-    "p_modern": 0.8100334405899048,
-    "flag": false,
+    "p_modern": 0.9967678189277649,
+    "flag": true,
     "top3": [
-     "Peugeot 3008 (2017)",
-     "Honda Elevate",
+     "Skoda Kodiaq",
+     "Volkswagen Taigun",
      "Mahindra XUV700"
     ],
     "top1_correct": false,
@@ -161,12 +161,12 @@
    {
     "file": "Mahindra_XUV700_2.jpg",
     "truth": "Mahindra XUV700",
-    "p_modern": 0.7446213364601135,
-    "flag": false,
+    "p_modern": 0.9999680519104004,
+    "flag": true,
     "top3": [
-     "Volkswagen T-Roc",
      "Toyota bZ4X",
-     "Volkswagen Virtus"
+     "Nissan Kicks (2021)",
+     "Honda Elevate"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -174,38 +174,38 @@
    {
     "file": "Porsche_Taycan_1.jpg",
     "truth": "Porsche Taycan",
-    "p_modern": 0.6569474935531616,
-    "flag": false,
+    "p_modern": 0.9977642297744751,
+    "flag": true,
     "top3": [
-     "Tesla Model S (2021)",
      "Porsche Taycan",
-     "Lamborghini Revuelto"
+     "Porsche 718 Cayman",
+     "Porsche Panamera (2017)"
     ],
-    "top1_correct": false,
+    "top1_correct": true,
     "top3_correct": true
    },
    {
     "file": "Porsche_Taycan_2.jpg",
     "truth": "Porsche Taycan",
-    "p_modern": 0.4728911817073822,
-    "flag": false,
+    "p_modern": 0.977041482925415,
+    "flag": true,
     "top3": [
+     "Porsche Taycan",
      "Porsche Panamera (2017)",
-     "Tesla Model 3",
-     "Porsche Taycan"
+     "Ferrari Roma"
     ],
-    "top1_correct": false,
+    "top1_correct": true,
     "top3_correct": true
    },
    {
     "file": "Tata_Nexon_1.jpg",
     "truth": "Tata Nexon",
-    "p_modern": 0.9306851029396057,
+    "p_modern": 0.999819815158844,
     "flag": true,
     "top3": [
      "Tata Nexon",
-     "Tata Altroz",
-     "Tata Nexon EV"
+     "Mahindra XUV400",
+     "Mahindra XUV 3XO"
     ],
     "top1_correct": true,
     "top3_correct": true
@@ -213,12 +213,12 @@
    {
     "file": "Tata_Nexon_2.jpg",
     "truth": "Tata Nexon",
-    "p_modern": 0.989105224609375,
+    "p_modern": 0.9923266172409058,
     "flag": true,
     "top3": [
-     "Volkswagen T-Roc",
-     "Volkswagen Virtus",
-     "Tata Nexon"
+     "Tata Harrier",
+     "Ford Kuga (2020)",
+     "Tata Nexon EV"
     ],
     "top1_correct": false,
     "top3_correct": true
@@ -226,12 +226,12 @@
    {
     "file": "Tesla_Model_3_2.jpg",
     "truth": "Tesla Model 3",
-    "p_modern": 0.6454945802688599,
+    "p_modern": 0.5072121620178223,
     "flag": false,
     "top3": [
-     "Isuzu D-Max V-Cross",
-     "Volvo EX30",
-     "Isuzu MU-X"
+     "Cadillac XT4",
+     "Chevrolet Camaro (2016)",
+     "Chevrolet Equinox (2018)"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -239,25 +239,25 @@
    {
     "file": "Tesla_Model_Y_1.jpg",
     "truth": "Tesla Model Y",
-    "p_modern": 0.2987019419670105,
-    "flag": false,
+    "p_modern": 0.990129292011261,
+    "flag": true,
     "top3": [
-     "Ferrari Purosangue",
-     "Porsche 718 Cayman",
-     "Tesla Model Y"
+     "Tesla Model Y",
+     "Tesla Model 3",
+     "Audi e-tron GT"
     ],
-    "top1_correct": false,
+    "top1_correct": true,
     "top3_correct": true
    },
    {
     "file": "Tesla_Model_Y_2.jpg",
     "truth": "Tesla Model Y",
-    "p_modern": 0.9148537516593933,
+    "p_modern": 0.9974424839019775,
     "flag": true,
     "top3": [
      "Tesla Model 3",
-     "Tesla Model Y",
-     "Ford Puma"
+     "Tesla Model X",
+     "Tesla Model Y"
     ],
     "top1_correct": false,
     "top3_correct": true
@@ -265,12 +265,12 @@
    {
     "file": "Toyota_GR86_1.jpg",
     "truth": "Toyota GR86",
-    "p_modern": 0.5414928793907166,
-    "flag": false,
+    "p_modern": 0.9994617700576782,
+    "flag": true,
     "top3": [
-     "Ferrari Purosangue",
-     "Porsche 718 Cayman",
-     "Hyundai Exter"
+     "Chevrolet Corvette C8",
+     "Cadillac CT5",
+     "Lamborghini Urus"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -278,12 +278,12 @@
    {
     "file": "Toyota_GR86_2.jpg",
     "truth": "Toyota GR86",
-    "p_modern": 0.622308611869812,
-    "flag": false,
+    "p_modern": 0.9846911430358887,
+    "flag": true,
     "top3": [
-     "Ferrari Purosangue",
      "Hyundai Exter",
-     "Audi A4 B9"
+     "Ford Puma",
+     "Ford Mustang Mach-E"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -291,38 +291,38 @@
    {
     "file": "Toyota_RAV4_XA50_1.jpg",
     "truth": "Toyota RAV4",
-    "p_modern": 0.9628230333328247,
+    "p_modern": 0.9991814494132996,
     "flag": true,
     "top3": [
-     "Toyota Urban Cruiser Hyryder",
-     "Hyundai Exter",
-     "BYD Han"
+     "Toyota RAV4 (2019)",
+     "Hyundai Santa Fe (2024)",
+     "Renault Austral"
     ],
-    "top1_correct": false,
-    "top3_correct": false
+    "top1_correct": true,
+    "top3_correct": true
    },
    {
     "file": "Toyota_RAV4_XA50_2.jpg",
     "truth": "Toyota RAV4",
-    "p_modern": 0.9982041120529175,
+    "p_modern": 0.9999804496765137,
     "flag": true,
     "top3": [
-     "Toyota bZ4X",
      "Toyota RAV4 (2019)",
-     "Toyota Urban Cruiser Hyryder"
+     "Toyota Highlander (2020)",
+     "Toyota bZ4X"
     ],
-    "top1_correct": false,
+    "top1_correct": true,
     "top3_correct": true
    },
    {
     "file": "Volkswagen_ID_4_1.jpg",
     "truth": "Volkswagen ID.4",
-    "p_modern": 0.9957940578460693,
+    "p_modern": 0.9999949336051941,
     "flag": true,
     "top3": [
-     "Volkswagen Arteon",
-     "Toyota bZ4X",
-     "Skoda Enyaq"
+     "Toyota Camry (2025)",
+     "BMW i7",
+     "Toyota bZ4X"
     ],
     "top1_correct": false,
     "top3_correct": false
@@ -330,7 +330,7 @@
    {
     "file": "Volkswagen_ID_4_2.jpg",
     "truth": "Volkswagen ID.4",
-    "p_modern": 0.9981696605682373,
+    "p_modern": 0.9999997019767761,
     "flag": true,
     "top3": [
      "Volkswagen ID.4",

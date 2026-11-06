@@ -34,12 +34,13 @@ class OpenSet:
 
     @staticmethod
     def preprocess(crop: np.ndarray) -> np.ndarray:
-        """Letterbox to a square (keeps the whole car, unlike centre-crop), 224 px, CLIP normalisation."""
+        """CLIP's own recipe: shortest side -> 224 (bicubic), centre crop 224, CLIP normalisation.
+        (Letterboxing the whole car was tried first: 62% vs 82% zero-shot top-1 on validation.)"""
         h, w = crop.shape[:2]
-        s = max(h, w)
-        canvas = np.full((s, s, 3), (123, 117, 104), np.uint8)
-        canvas[(s - h) // 2:(s - h) // 2 + h, (s - w) // 2:(s - w) // 2 + w] = crop
-        x = cv2.resize(canvas, (224, 224), interpolation=cv2.INTER_CUBIC).astype(np.float32) / 255.0
+        s = 224 / min(h, w)
+        img = cv2.resize(crop, (max(224, round(w * s)), max(224, round(h * s))), interpolation=cv2.INTER_CUBIC)
+        y0, x0 = (img.shape[0] - 224) // 2, (img.shape[1] - 224) // 2
+        x = img[y0:y0 + 224, x0:x0 + 224].astype(np.float32) / 255.0
         return ((x.transpose(2, 0, 1) - MEAN) / STD)[None]
 
     def raw(self, crop: np.ndarray) -> dict:

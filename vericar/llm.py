@@ -71,7 +71,9 @@ def officer_note(result: dict, claim_label: str | None) -> str | None:
         "verdict": v["status"], "headline": v["headline"], "detail": v["detail"],
         "claimed_registration": claim_label,
         "level_checks": [{k: (round(x, 3) if isinstance(x, float) else x) for k, x in lv.items()} for lv in v["levels"]],
-        "top_candidates": [{"label": c["label"], "prob": round(c["prob"], 3)} for c in v["candidates"]],
+        # for a car outside the 196 known models the 2012-era candidates are meaningless - leave them out
+        "top_candidates": [] if result.get("unknown") else
+        [{"label": c["label"], "prob": round(c["prob"], 3)} for c in v["candidates"]],
         "image_quality_issues": result["quality"]["issues"], "outside_known_models": result["unknown"],
     }
     prompt = ("You write a short note for a parking/fleet officer checking whether a car matches its "

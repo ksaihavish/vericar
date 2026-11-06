@@ -16,6 +16,8 @@ import streamlit as st
 import components as ui
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
+STATUS_COL = {"MATCH": ("#17803A", "✓"), "PARTIAL": ("#D9A21B", "◐"), "INSPECT": ("#C2622D", "?"),
+              "MISMATCH": ("#B42318", "✕"), "UNKNOWN": ("#6250d6", "◌"), "RETAKE": ("#8A8478", "↻")}
 MCOL = {"Classical": ui.METHOD["classical"], "Deep": ui.METHOD["deep"], "Hybrid (ours)": ui.METHOD["hybrid"]}
 CLAIM_COL = {"Legit claim": "#2a78d6", "Hard clone": "#eb6834", "Easy clone": "#1baf7a"}
 
@@ -80,14 +82,14 @@ def render_results() -> None:
     k = st.columns(4)
     for col, (lab, v) in zip(k, (("Hybrid Top-1", _pct(hyb["top1"])), ("Hybrid Top-5", _pct(hyb["top5"])),
                                  ("Detector mAP@0.5", _pct(det["mAP50"])), ("Mean box IoU", f"{det['mean_iou']:.3f}"))):
-        col.markdown(ui.kpi(lab, v), unsafe_allow_html=True)
+        col.metric(lab, v, border=True)
     k = st.columns(4)
     lat = opt.get("rows", {}).get(chosen, {})
     for col, (lab, v) in zip(k, (("Hard-clone catch rate", _pct(ver["catch_rate_hard"])),
                                  ("False-alarm rate (legit)", _pct(ver["false_alarm_rate"])),
                                  ("Classifier size (shipped)", f"{lat.get('size_mb', 0):.0f} MB"),
                                  ("Classifier CPU latency", f"{lat.get('median_ms', 0):.0f} ms"))):
-        col.markdown(ui.kpi(lab, v), unsafe_allow_html=True)
+        col.metric(lab, v, border=True)
 
     t1, t2, t3, t4, t5, t6 = st.tabs(["Classical vs Deep vs Hybrid", "Verification", "Confidence",
                                       "Robustness", "Ablation & optimisation", "Failures & limits"])
@@ -111,11 +113,9 @@ def render_results() -> None:
         with c2:
             st.markdown("**Where the mistakes are**: most are look-alikes inside the same make")
             eb = final["similar_classes"]["error_breakdown"]
-            st.markdown(ui.kpi("Errors that are same model, other year", _pct(eb["same_model_other_year"])),
-                        unsafe_allow_html=True)
-            st.markdown(ui.kpi("Errors that are same make, other model", _pct(eb["same_make_other_model"])),
-                        unsafe_allow_html=True)
-            st.markdown(ui.kpi("Errors that are another make", _pct(eb["other_make"])), unsafe_allow_html=True)
+            st.metric("Same model, other year", _pct(eb["same_model_other_year"]), border=True)
+            st.metric("Same make, other model", _pct(eb["same_make_other_model"]), border=True)
+            st.metric("Another make", _pct(eb["other_make"]), border=True)
         st.dataframe(df.style.format({c: "{:.1%}" for c in df.columns[1:-1]} | {"ECE": "{:.3f}"}), hide_index=True)
         st.markdown("**Detection**")
         ddf = pd.DataFrame([{"Detector": n, "mAP@0.5": d["mAP50"], "mAP@0.5:0.95": d["mAP50_95"], "Mean IoU": d["mean_iou"],
@@ -149,7 +149,7 @@ def render_results() -> None:
         order = ["MATCH", "PARTIAL", "INSPECT", "MISMATCH", "UNKNOWN", "RETAKE"]
         fig = go.Figure()
         for s in order:
-            colr, icon, tag = ui.STATUS[s]
+            colr, icon = STATUS_COL[s]
             fig.add_bar(y=["Legit claim", "Hard clone", "Easy clone"],
                         x=[ver["legit"][s], ver["hard_clone"][s], ver["easy_clone"][s]], orientation="h",
                         name=f"{icon} {s}", marker=dict(color=colr, line=dict(color=ui.PANEL, width=2)),
