@@ -11,7 +11,7 @@ The rubric gives 25 points to the demo and viva: *"every member can explain thei
 **Why claim verification and not just classification?** The user (a parking/fleet officer) already *has* a claimed identity from the plate record. The real question is "does this car match?", and cloned plates are put on look-alike cars, which is exactly the fine-grained problem.
 
 **Likely questions**
-- *Why is it strict?* A missed clone costs more than a two-minute manual check. τ_match is the lowest threshold that clears ≤ 5% of *hard* clones on validation. The cost of that choice is the false-alarm rate, which we report.
+- *Why is it strict?* A missed clone costs more than a two-minute manual check. τ_match is the lowest threshold that clears ≤ 2% of *hard* clones on validation. The cost of that choice is the false-alarm rate, which we report.
 - *What is a hard clone?* For each class, the most similar other class: nearest class prototype in the CNN embedding space, computed from training images only.
 - *How do you know the car is outside the dataset?* Cosine kNN distance (k = 10) from the image's 768-d embedding to all training embeddings. The threshold is the 95th percentile of validation distances, so about 5% of known cars are also sent to a manual check. AUROC against modern-car photos is in the report.
 - *How did you avoid tuning on the test set?* Every parameter was frozen on validation. `evaluate_final.py` refuses to run twice, and `results/test_run.json` is the record.

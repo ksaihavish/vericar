@@ -63,7 +63,7 @@ def load_perturbed(rec: dict, name: str, seed: int) -> np.ndarray:
 
 
 # ------------------------------------------------------------------ detection
-def detect_all(weights, recs, perturb="clean", coco=False, conf=0.001, bs=32):
+def detect_all(weights, recs, perturb="clean", coco=False, conf=0.001, bs=64):
     """All detections per record as [(box, score), ...]. Perturbed images are passed as arrays."""
     from vericar.detector import COCO_VEHICLES
     from ultralytics import YOLO
@@ -137,10 +137,10 @@ def load_torch_classifier(dev="cuda"):
 
 
 @torch.no_grad()
-def run_set(ds: CropSet, model=None, svm=None, bs=64, workers=8) -> dict:
+def run_set(ds: CropSet, model=None, svm=None, bs=64, workers=6) -> dict:
     """Returns logits/feats (if model), classical probs (if svm & features), labels, flags."""
     L, F, P, Y, Q, E = [], [], [], [], [], []
-    for x, f, y, qi, en in DataLoader(ds, batch_size=bs, num_workers=workers, persistent_workers=False):
+    for x, f, y, qi, en in DataLoader(ds, batch_size=bs, num_workers=workers, persistent_workers=False, pin_memory=True, prefetch_factor=4):
         if model is not None:
             with torch.autocast("cuda", dtype=torch.bfloat16):
                 lo, fe = model(x.cuda().to(memory_format=torch.channels_last))

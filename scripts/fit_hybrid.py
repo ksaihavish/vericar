@@ -29,7 +29,7 @@ from vericar.evaluation import claim_sets, cleared_rate, clone_study, ece, topk_
 from vericar.hybrid import KnnOOD, Thresholds, fit_temperature, fuse, softmax  # noqa: E402
 
 OOD_K = 10
-HARD_CLONE_MAX_MATCH = 0.05
+HARD_CLONE_MAX_MATCH = 0.02   # strict: at most 2% of hard clones may be cleared (validation)
 LEGIT_MAX_MISMATCH = 0.01
 IDENTIFY_TARGET_ACC = 0.95
 MODEL_VERIFIED = 0.80

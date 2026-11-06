@@ -1,0 +1,1539 @@
+{
+ "n_test": 8041,
+ "frozen_params": {
+  "temperature": 0.6,
+  "fusion_weight": 0.0,
+  "thresholds": {
+   "match": 0.83,
+   "model": 0.8,
+   "mismatch": 0.01,
+   "identify": 0.49
+  },
+  "ood_threshold": 0.5104219317436218
+ },
+ "detection": {
+  "YOLO11n fine-tuned (ours)": {
+   "mAP50": 0.9895088158390439,
+   "mAP50_95": 0.9327102204272618,
+   "mean_iou": 0.952706363183206,
+   "iou_ge_0.5": 0.9981345603780625,
+   "iou_ge_0.75": 0.9896779007586121,
+   "miss_rate": 0.00012436264146250465
+  },
+  "YOLO11n COCO-pretrained": {
+   "mAP50": 0.8545506634995861,
+   "mAP50_95": 0.7822916825669126,
+   "mean_iou": 0.8707546024485217,
+   "iou_ge_0.5": 0.9151846785225718,
+   "iou_ge_0.75": 0.904862579281184,
+   "miss_rate": 0.001119263773162542
+  },
+  "Classical edges+contours": {
+   "mAP50": 0.6403879050849707,
+   "mAP50_95": 0.22634080517161875,
+   "mean_iou": 0.6541479008182157,
+   "iou_ge_0.5": 0.7962939932844174,
+   "iou_ge_0.75": 0.3170003730879244,
+   "miss_rate": 0.0
+  }
+ },
+ "methods": {
+  "Classical (contour ROI + HOG/LBP/GLCM/colour/geometry + SVM)": {
+   "top1": 0.05658500186543962,
+   "top5": 0.15271732371595573,
+   "make_acc": 0.14861335654769306,
+   "model_acc": 0.05907225469468971,
+   "year_given_model_acc": 0.9639830508474576,
+   "ece": 0.00406568786452263
+  },
+  "Deep (YOLO crop + ConvNeXt-T)": {
+   "top1": 0.9340878000248726,
+   "top5": 0.9917920656634747,
+   "make_acc": 0.9783609003855241,
+   "model_acc": 0.9398084815321477,
+   "year_given_model_acc": 0.994042891183479,
+   "ece": 0.14484671541480276
+  },
+  "Hybrid (ours)": {
+   "top1": 0.93396343738341,
+   "top5": 0.9917920656634747,
+   "make_acc": 0.9779878124611366,
+   "model_acc": 0.9395597562492227,
+   "year_given_model_acc": 0.9940421024758375,
+   "ece": 0.011551759527395495
+  },
+  "Reference: ConvNeXt-T on ground-truth crop": {
+   "top1": 0.9343365253077975,
+   "top5": 0.9921651535878622,
+   "make_acc": 0.9774903618952867,
+   "model_acc": 0.9398084815321477,
+   "year_given_model_acc": 0.9944422389837237,
+   "ece": 0.14538172612997777
+  }
+ },
+ "hybrid_rates": {
+  "enhanced": 0.006466857356050243,
+  "quality_flagged": 0.0034821539609501307,
+  "unknown_flagged": 0.06603656261658998,
+  "no_detection": 0.0006218132073125233
+ },
+ "ablation": {
+  "Full hybrid": {
+   "top1": 0.93396343738341,
+   "top5": 0.9917920656634747,
+   "make_acc": 0.9779878124611366,
+   "model_acc": 0.9395597562492227,
+   "year_given_model_acc": 0.9940421024758375,
+   "ece": 0.011551759527395495,
+   "false_alarm_rate": 0.17087426936948136,
+   "catch_rate_hard": 0.9832110434025618,
+   "catch_rate_easy": 1.0
+  },
+  "- adaptive preprocessing": {
+   "top1": 0.9340878000248726,
+   "top5": 0.9917920656634747,
+   "make_acc": 0.9781121751025992,
+   "model_acc": 0.9398084815321477,
+   "year_given_model_acc": 0.994042891183479,
+   "ece": 0.011319690266179995,
+   "false_alarm_rate": 0.17037681880363142,
+   "catch_rate_hard": 0.9832110434025618,
+   "catch_rate_easy": 1.0
+  },
+  "- YOLO ROI crop (full frame)": {
+   "top1": 0.9219002611615471,
+   "top5": 0.988931724909837,
+   "make_acc": 0.9701529660489989,
+   "model_acc": 0.9276209426688223,
+   "year_given_model_acc": 0.9943677081936435,
+   "ece": 0.013928060103316688,
+   "false_alarm_rate": 0.23989553538117148,
+   "catch_rate_hard": 0.983957219251337,
+   "catch_rate_easy": 1.0
+  },
+  "- classical feature fusion (w=0)": {
+   "top1": 0.93396343738341,
+   "top5": 0.9917920656634747,
+   "make_acc": 0.9779878124611366,
+   "model_acc": 0.9395597562492227,
+   "year_given_model_acc": 0.9940421024758375,
+   "ece": 0.011551759527395495,
+   "false_alarm_rate": 0.17087426936948136,
+   "catch_rate_hard": 0.9832110434025618,
+   "catch_rate_easy": 1.0
+  },
+  "- temperature calibration (T=1)": {
+   "top1": 0.93396343738341,
+   "top5": 0.9917920656634747,
+   "make_acc": 0.9782365377440617,
+   "model_acc": 0.9395597562492227,
+   "year_given_model_acc": 0.9940421024758375,
+   "ece": 0.1450158279991879,
+   "false_alarm_rate": 0.425817684367616,
+   "catch_rate_hard": 0.9926626041537122,
+   "catch_rate_easy": 1.0
+  },
+  "- quality gate & unknown check": {
+   "top1": 0.93396343738341,
+   "top5": 0.9917920656634747,
+   "make_acc": 0.9779878124611366,
+   "model_acc": 0.9395597562492227,
+   "year_given_model_acc": 0.9940421024758375,
+   "ece": 0.011551759527395495,
+   "false_alarm_rate": 0.13928615843800518,
+   "catch_rate_hard": 0.9823405049123244,
+   "catch_rate_easy": 1.0
+  }
+ },
+ "confidence": {
+  "coverage_hybrid": [
+   {
+    "threshold": 0.0,
+    "coverage": 1.0,
+    "accuracy": 0.9337147121004851
+   },
+   {
+    "threshold": 0.049999999999999996,
+    "coverage": 1.0,
+    "accuracy": 0.9337147121004851
+   },
+   {
+    "threshold": 0.09999999999999999,
+    "coverage": 1.0,
+    "accuracy": 0.9337147121004851
+   },
+   {
+    "threshold": 0.15,
+    "coverage": 0.99950254943415,
+    "accuracy": 0.9341794201816598
+   },
+   {
+    "threshold": 0.19999999999999998,
+    "coverage": 0.9981345603780625,
+    "accuracy": 0.9350859705955644
+   },
+   {
+    "threshold": 0.24999999999999997,
+    "coverage": 0.9956473075488124,
+    "accuracy": 0.9367974019485386
+   },
+   {
+    "threshold": 0.3,
+    "coverage": 0.9934087800024872,
+    "accuracy": 0.9376564847270906
+   },
+   {
+    "threshold": 0.35,
+    "coverage": 0.9901753513244621,
+    "accuracy": 0.9394624466214518
+   },
+   {
+    "threshold": 0.39999999999999997,
+    "coverage": 0.9865688347220495,
+    "accuracy": 0.9412580360519349
+   },
+   {
+    "threshold": 0.44999999999999996,
+    "coverage": 0.9814699664220868,
+    "accuracy": 0.9433603649265079
+   },
+   {
+    "threshold": 0.49999999999999994,
+    "coverage": 0.9725158562367865,
+    "accuracy": 0.9474424552429668
+   },
+   {
+    "threshold": 0.5499999999999999,
+    "coverage": 0.9614475811466235,
+    "accuracy": 0.9522700814901047
+   },
+   {
+    "threshold": 0.6,
+    "coverage": 0.9501305807735356,
+    "accuracy": 0.956151832460733
+   },
+   {
+    "threshold": 0.6499999999999999,
+    "coverage": 0.9368237781370476,
+    "accuracy": 0.9609717244125846
+   },
+   {
+    "threshold": 0.7,
+    "coverage": 0.9255067777639597,
+    "accuracy": 0.9642569201827466
+   },
+   {
+    "threshold": 0.7499999999999999,
+    "coverage": 0.9120756124860092,
+    "accuracy": 0.9670029997272975
+   },
+   {
+    "threshold": 0.7999999999999999,
+    "coverage": 0.8955353811714961,
+    "accuracy": 0.9712539925010415
+   },
+   {
+    "threshold": 0.85,
+    "coverage": 0.8743937321228703,
+    "accuracy": 0.9759635898165268
+   },
+   {
+    "threshold": 0.8999999999999999,
+    "coverage": 0.8434274343987066,
+    "accuracy": 0.9795045709230316
+   },
+   {
+    "threshold": 0.95,
+    "coverage": 0.7836090038552419,
+    "accuracy": 0.982859863513728
+   }
+  ],
+  "coverage_deep": [
+   {
+    "threshold": 0.0,
+    "coverage": 1.0,
+    "accuracy": 0.9338390747419475
+   },
+   {
+    "threshold": 0.049999999999999996,
+    "coverage": 1.0,
+    "accuracy": 0.9338390747419475
+   },
+   {
+    "threshold": 0.09999999999999999,
+    "coverage": 0.9968909339634374,
+    "accuracy": 0.9360029940119761
+   },
+   {
+    "threshold": 0.15,
+    "coverage": 0.9907971645317747,
+    "accuracy": 0.9388728505083469
+   },
+   {
+    "threshold": 0.19999999999999998,
+    "coverage": 0.9818430543464743,
+    "accuracy": 0.9435085497150095
+   },
+   {
+    "threshold": 0.24999999999999997,
+    "coverage": 0.9699042407660738,
+    "accuracy": 0.9469162713168355
+   },
+   {
+    "threshold": 0.3,
+    "coverage": 0.959830866807611,
+    "accuracy": 0.9495983415392589
+   },
+   {
+    "threshold": 0.35,
+    "coverage": 0.9454048003979605,
+    "accuracy": 0.9527755853722705
+   },
+   {
+    "threshold": 0.39999999999999997,
+    "coverage": 0.9274965800273598,
+    "accuracy": 0.9582998122821131
+   },
+   {
+    "threshold": 0.44999999999999996,
+    "coverage": 0.9064792936201965,
+    "accuracy": 0.9628206887090136
+   },
+   {
+    "threshold": 0.49999999999999994,
+    "coverage": 0.8828503917423206,
+    "accuracy": 0.9687279898577265
+   },
+   {
+    "threshold": 0.5499999999999999,
+    "coverage": 0.8584753140156697,
+    "accuracy": 0.9724757351875996
+   },
+   {
+    "threshold": 0.6,
+    "coverage": 0.8291257306305186,
+    "accuracy": 0.9751012449377531
+   },
+   {
+    "threshold": 0.6499999999999999,
+    "coverage": 0.7956721800771048,
+    "accuracy": 0.9771803688652704
+   },
+   {
+    "threshold": 0.7,
+    "coverage": 0.7537619699042407,
+    "accuracy": 0.9800362976406534
+   },
+   {
+    "threshold": 0.7499999999999999,
+    "coverage": 0.7078721552045766,
+    "accuracy": 0.9819044272663388
+   },
+   {
+    "threshold": 0.7999999999999999,
+    "coverage": 0.639970152966049,
+    "accuracy": 0.9836766420520793
+   },
+   {
+    "threshold": 0.85,
+    "coverage": 0.5512995896032832,
+    "accuracy": 0.9844349199187908
+   },
+   {
+    "threshold": 0.8999999999999999,
+    "coverage": 0.4084069145628653,
+    "accuracy": 0.9853836784409257
+   },
+   {
+    "threshold": 0.95,
+    "coverage": 0.17684367615968163,
+    "accuracy": 0.9901547116736991
+   }
+  ],
+  "reliability_hybrid": [
+   {
+    "lo": 0.06666666666666667,
+    "hi": 0.13333333333333333,
+    "conf": 0.12353628128767014,
+    "acc": 0.0,
+    "n": 3
+   },
+   {
+    "lo": 0.13333333333333333,
+    "hi": 0.2,
+    "conf": 0.1681467443704605,
+    "acc": 0.25,
+    "n": 12
+   },
+   {
+    "lo": 0.2,
+    "hi": 0.26666666666666666,
+    "conf": 0.22957569360733032,
+    "acc": 0.2727272727272727,
+    "n": 22
+   },
+   {
+    "lo": 0.26666666666666666,
+    "hi": 0.3333333333333333,
+    "conf": 0.2978454530239105,
+    "acc": 0.41935483870967744,
+    "n": 31
+   },
+   {
+    "lo": 0.3333333333333333,
+    "hi": 0.4,
+    "conf": 0.3657180666923523,
+    "acc": 0.475,
+    "n": 40
+   },
+   {
+    "lo": 0.4,
+    "hi": 0.4666666666666667,
+    "conf": 0.43628832697868347,
+    "acc": 0.4696969696969697,
+    "n": 66
+   },
+   {
+    "lo": 0.4666666666666667,
+    "hi": 0.5333333333333333,
+    "conf": 0.5014756321907043,
+    "acc": 0.5445544554455446,
+    "n": 101
+   },
+   {
+    "lo": 0.5333333333333333,
+    "hi": 0.6,
+    "conf": 0.5644563436508179,
+    "acc": 0.6031746031746031,
+    "n": 126
+   },
+   {
+    "lo": 0.6,
+    "hi": 0.6666666666666666,
+    "conf": 0.6304284334182739,
+    "acc": 0.6417910447761194,
+    "n": 134
+   },
+   {
+    "lo": 0.6666666666666666,
+    "hi": 0.7333333333333333,
+    "conf": 0.7009585499763489,
+    "acc": 0.7089552238805971,
+    "n": 134
+   },
+   {
+    "lo": 0.7333333333333333,
+    "hi": 0.8,
+    "conf": 0.7698231935501099,
+    "acc": 0.7602339181286549,
+    "n": 171
+   },
+   {
+    "lo": 0.8,
+    "hi": 0.8666666666666667,
+    "conf": 0.8355023264884949,
+    "acc": 0.8170212765957446,
+    "n": 235
+   },
+   {
+    "lo": 0.8666666666666667,
+    "hi": 0.9333333333333333,
+    "conf": 0.904594361782074,
+    "acc": 0.9024390243902439,
+    "n": 451
+   },
+   {
+    "lo": 0.9333333333333333,
+    "hi": 1.0,
+    "conf": 0.9910151958465576,
+    "acc": 0.9815809669992326,
+    "n": 6515
+   }
+  ],
+  "reliability_deep": [
+   {
+    "lo": 0.0,
+    "hi": 0.06666666666666667,
+    "conf": 0.057414859533309937,
+    "acc": 0.0,
+    "n": 2
+   },
+   {
+    "lo": 0.06666666666666667,
+    "hi": 0.13333333333333333,
+    "conf": 0.10287993401288986,
+    "acc": 0.3333333333333333,
+    "n": 51
+   },
+   {
+    "lo": 0.13333333333333333,
+    "hi": 0.2,
+    "conf": 0.16759097576141357,
+    "acc": 0.46236559139784944,
+    "n": 93
+   },
+   {
+    "lo": 0.2,
+    "hi": 0.26666666666666666,
+    "conf": 0.23013313114643097,
+    "acc": 0.6814159292035398,
+    "n": 113
+   },
+   {
+    "lo": 0.26666666666666666,
+    "hi": 0.3333333333333333,
+    "conf": 0.30257973074913025,
+    "acc": 0.7183098591549296,
+    "n": 142
+   },
+   {
+    "lo": 0.3333333333333333,
+    "hi": 0.4,
+    "conf": 0.3690870404243469,
+    "acc": 0.6758241758241759,
+    "n": 182
+   },
+   {
+    "lo": 0.4,
+    "hi": 0.4666666666666667,
+    "conf": 0.4326128363609314,
+    "acc": 0.75,
+    "n": 224
+   },
+   {
+    "lo": 0.4666666666666667,
+    "hi": 0.5333333333333333,
+    "conf": 0.49982911348342896,
+    "acc": 0.7888888888888889,
+    "n": 270
+   },
+   {
+    "lo": 0.5333333333333333,
+    "hi": 0.6,
+    "conf": 0.5682655572891235,
+    "acc": 0.8922558922558923,
+    "n": 297
+   },
+   {
+    "lo": 0.6,
+    "hi": 0.6666666666666666,
+    "conf": 0.6347633004188538,
+    "acc": 0.9222520107238605,
+    "n": 373
+   },
+   {
+    "lo": 0.6666666666666666,
+    "hi": 0.7333333333333333,
+    "conf": 0.7007451057434082,
+    "acc": 0.9391304347826087,
+    "n": 460
+   },
+   {
+    "lo": 0.7333333333333333,
+    "hi": 0.8,
+    "conf": 0.7689934372901917,
+    "acc": 0.9636627906976745,
+    "n": 688
+   },
+   {
+    "lo": 0.8,
+    "hi": 0.8666666666666667,
+    "conf": 0.8364361524581909,
+    "acc": 0.9776699029126213,
+    "n": 1030
+   },
+   {
+    "lo": 0.8666666666666667,
+    "hi": 0.9333333333333333,
+    "conf": 0.9033791422843933,
+    "acc": 0.9790174002047083,
+    "n": 1954
+   },
+   {
+    "lo": 0.9333333333333333,
+    "hi": 1.0,
+    "conf": 0.95831698179245,
+    "acc": 0.9907493061979649,
+    "n": 2162
+   }
+  ],
+  "identify_threshold": 0.49,
+  "at_identify_threshold": {
+   "coverage": 0.9742569332172616,
+   "accuracy": 0.946642838907327
+  },
+  "top3_acc_when_low_confidence": 0.7294685990338164
+ },
+ "verification": {
+  "legit": {
+   "MATCH": 0.8291257306305186,
+   "PARTIAL": 0.014177341126725532,
+   "INSPECT": 0.0776022882726029,
+   "MISMATCH": 0.01094391244870041,
+   "UNKNOWN": 0.06466857356050243,
+   "RETAKE": 0.0034821539609501307
+  },
+  "hard_clone": {
+   "MATCH": 0.01678895659743813,
+   "PARTIAL": 0.028230319611988557,
+   "INSPECT": 0.14824026862330555,
+   "MISMATCH": 0.7385897276458152,
+   "UNKNOWN": 0.06466857356050243,
+   "RETAKE": 0.0034821539609501307
+  },
+  "easy_clone": {
+   "MATCH": 0.0,
+   "PARTIAL": 0.0,
+   "INSPECT": 0.000746175848775028,
+   "MISMATCH": 0.9311030966297724,
+   "UNKNOWN": 0.06466857356050243,
+   "RETAKE": 0.0034821539609501307
+  },
+  "false_alarm_rate": 0.17087426936948136,
+  "catch_rate_hard": 0.9832110434025618,
+  "catch_rate_easy": 1.0,
+  "deep_only_same_thresholds": {
+   "false_alarm_rate": 0.41810720059694073,
+   "catch_rate_hard": 0.9926626041537122,
+   "catch_rate_easy": 1.0
+  },
+  "sweep": [
+   {
+    "t": 0.05,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.06,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.07,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.08,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.09,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.1,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.11,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.12,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.13,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.14,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.15,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.16,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.17,
+    "legit": 0.8829747543837831,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.18,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.19,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.2,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.21,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.032956099987563735,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.22,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.23,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.24,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.25,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.26,
+    "legit": 0.8828503917423206,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.27,
+    "legit": 0.8827260291008581,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.28,
+    "legit": 0.8827260291008581,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.29,
+    "legit": 0.8826016664593956,
+    "hard_clone": 0.03283173734610123,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.3,
+    "legit": 0.8824773038179331,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.31,
+    "legit": 0.8823529411764706,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.32,
+    "legit": 0.8822285785350081,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.33,
+    "legit": 0.8821042158935456,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.34,
+    "legit": 0.8819798532520831,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.35,
+    "legit": 0.8818554906106205,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.36,
+    "legit": 0.8817311279691581,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.37,
+    "legit": 0.8816067653276956,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.38,
+    "legit": 0.8816067653276956,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.39,
+    "legit": 0.8813580400447706,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.4,
+    "legit": 0.881233677403308,
+    "hard_clone": 0.03270737470463873,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.41,
+    "legit": 0.8811093147618455,
+    "hard_clone": 0.03258301206317622,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.42,
+    "legit": 0.880487501554533,
+    "hard_clone": 0.03245864942171372,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.43,
+    "legit": 0.880238776271608,
+    "hard_clone": 0.03245864942171372,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.44,
+    "legit": 0.879990050988683,
+    "hard_clone": 0.03220992413878871,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.45,
+    "legit": 0.8798656883472205,
+    "hard_clone": 0.03208556149732621,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.46,
+    "legit": 0.8793682377813705,
+    "hard_clone": 0.031961198855863696,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.47,
+    "legit": 0.8791195124984454,
+    "hard_clone": 0.03171247357293869,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.48,
+    "legit": 0.8783733366496704,
+    "hard_clone": 0.03146374829001368,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.49,
+    "legit": 0.8778758860838204,
+    "hard_clone": 0.031339385648551175,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.5,
+    "legit": 0.8771297102350454,
+    "hard_clone": 0.03096629772416366,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.51,
+    "legit": 0.8762591717448078,
+    "hard_clone": 0.03096629772416366,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.52,
+    "legit": 0.8760104464618829,
+    "hard_clone": 0.029971396592463624,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.53,
+    "legit": 0.8748911826887203,
+    "hard_clone": 0.029971396592463624,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.54,
+    "legit": 0.8740206441984828,
+    "hard_clone": 0.029100858102226092,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.55,
+    "legit": 0.8727770177838577,
+    "hard_clone": 0.028727770177838577,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.56,
+    "legit": 0.8712846660863077,
+    "hard_clone": 0.028105956970526053,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.57,
+    "legit": 0.8700410396716827,
+    "hard_clone": 0.02773286904613854,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.58,
+    "legit": 0.8685486879741325,
+    "hard_clone": 0.027359781121751026,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.59,
+    "legit": 0.8678025121253575,
+    "hard_clone": 0.026862330555901006,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.6,
+    "legit": 0.8673050615595075,
+    "hard_clone": 0.02636487999005099,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.61,
+    "legit": 0.8655639845790325,
+    "hard_clone": 0.025991792065663474,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.62,
+    "legit": 0.8636985449570949,
+    "hard_clone": 0.02536997885835095,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.63,
+    "legit": 0.8623305559010074,
+    "hard_clone": 0.024375077726650915,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.64,
+    "legit": 0.8614600174107698,
+    "hard_clone": 0.024126352443725903,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.65,
+    "legit": 0.8602163909961448,
+    "hard_clone": 0.02350453923641338,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.66,
+    "legit": 0.8594702151473698,
+    "hard_clone": 0.023380176594950876,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.67,
+    "legit": 0.8582265887327447,
+    "hard_clone": 0.023131451312025868,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.68,
+    "legit": 0.8567342370351946,
+    "hard_clone": 0.02213655018032583,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.69,
+    "legit": 0.8559880611864196,
+    "hard_clone": 0.022012187538863325,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.7,
+    "legit": 0.8549931600547196,
+    "hard_clone": 0.02188782489740082,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.71,
+    "legit": 0.853873896281557,
+    "hard_clone": 0.021639099614475812,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.72,
+    "legit": 0.8517597313766945,
+    "hard_clone": 0.021141649048625793,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.73,
+    "legit": 0.8505161049620694,
+    "hard_clone": 0.020395473199850765,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.74,
+    "legit": 0.8488993906230569,
+    "hard_clone": 0.020146747916925757,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.75,
+    "legit": 0.8465365004352693,
+    "hard_clone": 0.020146747916925757,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.76,
+    "legit": 0.8445466981718692,
+    "hard_clone": 0.01977365999253824,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.77,
+    "legit": 0.8429299838328566,
+    "hard_clone": 0.019524934709613233,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.78,
+    "legit": 0.8415619947767691,
+    "hard_clone": 0.019276209426688222,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.79,
+    "legit": 0.839572192513369,
+    "hard_clone": 0.01890312150230071,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.8,
+    "legit": 0.8362144011938814,
+    "hard_clone": 0.01840567093645069,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.81,
+    "legit": 0.8336027857231688,
+    "hard_clone": 0.01790822037060067,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.82,
+    "legit": 0.8316129834597686,
+    "hard_clone": 0.017162044521825643,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.83,
+    "legit": 0.8291257306305186,
+    "hard_clone": 0.01678895659743813,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.84,
+    "legit": 0.8261410272354185,
+    "hard_clone": 0.016167143390125607,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.85,
+    "legit": 0.8234050491232434,
+    "hard_clone": 0.015545330182813084,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.86,
+    "legit": 0.8199228951622932,
+    "hard_clone": 0.015545330182813084,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.87,
+    "legit": 0.8156945653525681,
+    "hard_clone": 0.01492351697550056,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.88,
+    "legit": 0.8109687849769929,
+    "hard_clone": 0.014177341126725532,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.89,
+    "legit": 0.8061186419599552,
+    "hard_clone": 0.013431165277950503,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.9,
+    "legit": 0.8011441363014551,
+    "hard_clone": 0.012933714712100485,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.91,
+    "legit": 0.7961696306429549,
+    "hard_clone": 0.012560626787712971,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.92,
+    "legit": 0.7869667951747296,
+    "hard_clone": 0.011814450938937944,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.93,
+    "legit": 0.7785101355552791,
+    "hard_clone": 0.011565725656012934,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.94,
+    "legit": 0.7678149483895038,
+    "hard_clone": 0.011068275090162914,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.95,
+    "legit": 0.7510259917920656,
+    "hard_clone": 0.010322099241387887,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.96,
+    "legit": 0.7324959582141525,
+    "hard_clone": 0.009202835468225345,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.97,
+    "legit": 0.7071259793558016,
+    "hard_clone": 0.008456659619450317,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.98,
+    "legit": 0.6679517472951125,
+    "hard_clone": 0.00746175848775028,
+    "easy_clone": 0.0
+   },
+   {
+    "t": 0.99,
+    "legit": 0.5863698544957094,
+    "hard_clone": 0.005720681507275215,
+    "easy_clone": 0.0
+   }
+  ]
+ },
+ "similar_classes": {
+  "top_confusions": [
+   {
+    "true": "Audi S5 Coupe 2012",
+    "pred": "Audi A5 Coupe 2012",
+    "count": 16
+   },
+   {
+    "true": "Dodge Sprinter Cargo Van 2009",
+    "pred": "Mercedes-Benz Sprinter Van 2012",
+    "count": 13
+   },
+   {
+    "true": "Chevrolet Express Van 2007",
+    "pred": "Chevrolet Express Cargo Van 2007",
+    "count": 12
+   },
+   {
+    "true": "Audi TTS Coupe 2012",
+    "pred": "Audi TT Hatchback 2011",
+    "count": 12
+   },
+   {
+    "true": "Dodge Caliber Wagon 2007",
+    "pred": "Dodge Caliber Wagon 2012",
+    "count": 12
+   },
+   {
+    "true": "Chevrolet Silverado 1500 Regular Cab 2012",
+    "pred": "Chevrolet Silverado 2500HD Regular Cab 2012",
+    "count": 11
+   },
+   {
+    "true": "Dodge Caliber Wagon 2012",
+    "pred": "Dodge Caliber Wagon 2007",
+    "count": 10
+   },
+   {
+    "true": "Bentley Continental GT Coupe 2007",
+    "pred": "Bentley Continental GT Coupe 2012",
+    "count": 9
+   },
+   {
+    "true": "Chevrolet Express Van 2007",
+    "pred": "GMC Savana Van 2012",
+    "count": 9
+   },
+   {
+    "true": "Audi V8 Sedan 1994",
+    "pred": "Audi 100 Sedan 1994",
+    "count": 9
+   },
+   {
+    "true": "BMW 6 Series Convertible 2007",
+    "pred": "BMW M6 Convertible 2010",
+    "count": 8
+   },
+   {
+    "true": "Chevrolet Silverado 1500 Extended Cab 2012",
+    "pred": "Chevrolet Silverado 1500 Hybrid Crew Cab 2012",
+    "count": 7
+   },
+   {
+    "true": "Bugatti Veyron 16.4 Convertible 2009",
+    "pred": "Bugatti Veyron 16.4 Coupe 2009",
+    "count": 7
+   },
+   {
+    "true": "Spyker C8 Coupe 2009",
+    "pred": "Spyker C8 Convertible 2009",
+    "count": 7
+   },
+   {
+    "true": "Chevrolet Express Cargo Van 2007",
+    "pred": "Chevrolet Express Van 2007",
+    "count": 7
+   }
+  ],
+  "error_breakdown": {
+   "same_model_other_year": 0.08442776735459662,
+   "same_make_other_model": 0.5684803001876173,
+   "other_make": 0.34709193245778613,
+   "n_errors": 533
+  }
+ },
+ "viewpoint_proxy": {
+  "front/rear-ish (w/h < 1.4)": {
+   "n": 835,
+   "hybrid_top1": 0.8982035928143712,
+   "deep_top1": 0.8982035928143712,
+   "classical_top1": 0.0562874251497006
+  },
+  "three-quarter (1.4-1.9)": {
+   "n": 3467,
+   "hybrid_top1": 0.9466397461782521,
+   "deep_top1": 0.9463513123738102,
+   "classical_top1": 0.06085953273723681
+  },
+  "side-ish (>= 1.9)": {
+   "n": 3739,
+   "hybrid_top1": 0.9296603369884996,
+   "deep_top1": 0.9301952393688152,
+   "classical_top1": 0.052687884461085854
+  }
+ },
+ "unknown_detection": {
+  "test_flag_rate": 0.06603656261658998,
+  "probe_n": 25,
+  "probe_flag_rate": 0.64,
+  "auroc_knn": 0.9500161671433901,
+  "auroc_msp": 0.9578957841064545,
+  "probe_files": [
+   "Audi_Q4_e_tron_1.jpg",
+   "Audi_Q4_e_tron_2.jpg",
+   "Ford_Mustang_Mach_E_1.jpg",
+   "Ford_Mustang_Mach_E_2.jpg",
+   "Hyundai_Creta_SU2_1.jpg",
+   "Hyundai_Creta_SU2_2.jpg",
+   "Hyundai_Ioniq_5_1.jpg",
+   "Hyundai_Ioniq_5_2.jpg",
+   "Kia_EV6_1.jpg",
+   "Kia_EV6_2.jpg",
+   "Mahindra_XUV700_1.jpg",
+   "Mahindra_XUV700_2.jpg",
+   "Porsche_Taycan_1.jpg",
+   "Porsche_Taycan_2.jpg",
+   "Tata_Nexon_1.jpg",
+   "Tata_Nexon_2.jpg",
+   "Tesla_Model_3_2.jpg",
+   "Tesla_Model_Y_1.jpg",
+   "Tesla_Model_Y_2.jpg",
+   "Toyota_GR86_1.jpg",
+   "Toyota_GR86_2.jpg",
+   "Toyota_RAV4_XA50_1.jpg",
+   "Toyota_RAV4_XA50_2.jpg",
+   "Volkswagen_ID_4_1.jpg",
+   "Volkswagen_ID_4_2.jpg"
+  ],
+  "probe_scores": [
+   0.5215866565704346,
+   0.5679360628128052,
+   0.4845898151397705,
+   0.7199589014053345,
+   0.4744681119918823,
+   0.4977083206176758,
+   0.5774073600769043,
+   0.48223769664764404,
+   0.5020682215690613,
+   0.5646513104438782,
+   0.4934493899345398,
+   0.5124475955963135,
+   0.5980678796768188,
+   0.5744408369064331,
+   0.4839959144592285,
+   0.5474162101745605,
+   0.7185955047607422,
+   0.5371182560920715,
+   0.5060997605323792,
+   0.5706392526626587,
+   0.6177953481674194,
+   0.523664653301239,
+   0.4958849549293518,
+   0.5528936982154846,
+   0.5599187612533569
+  ],
+  "probe_pred": [
+   "Audi TTS Coupe 2012",
+   "Audi S6 Sedan 2011",
+   "Hyundai Tucson SUV 2012",
+   "Chevrolet Silverado 1500 Regular Cab 2012",
+   "Nissan Juke Hatchback 2012",
+   "Nissan Juke Hatchback 2012",
+   "Honda Odyssey Minivan 2012",
+   "Honda Odyssey Minivan 2012",
+   "Honda Odyssey Minivan 2012",
+   "Tesla Model S Sedan 2012",
+   "BMW X3 SUV 2012",
+   "Nissan Juke Hatchback 2012",
+   "Porsche Panamera Sedan 2012",
+   "Porsche Panamera Sedan 2012",
+   "Ford Fiesta Sedan 2012",
+   "Audi TTS Coupe 2012",
+   "Cadillac CTS-V Sedan 2012",
+   "Tesla Model S Sedan 2012",
+   "Tesla Model S Sedan 2012",
+   "Lamborghini Aventador Coupe 2012",
+   "Buick Verano Sedan 2012",
+   "Nissan Juke Hatchback 2012",
+   "Ford Edge SUV 2012",
+   "Honda Odyssey Minivan 2012",
+   "Hyundai Tucson SUV 2012"
+  ]
+ },
+ "robustness": {
+  "clean": {
+   "classical_top1": 0.054,
+   "deep_top1": 0.936,
+   "hybrid_top1": 0.936,
+   "hybrid_retake_rate": 0.003,
+   "enhanced_rate": 0.003,
+   "det_mean_iou": 0.953083833282338
+  },
+  "dark (x0.35)": {
+   "classical_top1": 0.016,
+   "deep_top1": 0.935,
+   "hybrid_top1": 0.904,
+   "hybrid_retake_rate": 0.242,
+   "enhanced_rate": 0.983,
+   "det_mean_iou": 0.950121131387049
+  },
+  "bright (x1.6)": {
+   "classical_top1": 0.048,
+   "deep_top1": 0.929,
+   "hybrid_top1": 0.929,
+   "hybrid_retake_rate": 0.002,
+   "enhanced_rate": 0.001,
+   "det_mean_iou": 0.9501042735199626
+  },
+  "low contrast (x0.4)": {
+   "classical_top1": 0.03,
+   "deep_top1": 0.929,
+   "hybrid_top1": 0.931,
+   "hybrid_retake_rate": 0.025,
+   "enhanced_rate": 0.564,
+   "det_mean_iou": 0.9511094711107253
+  },
+  "occlusion 10%": {
+   "classical_top1": 0.042,
+   "deep_top1": 0.917,
+   "hybrid_top1": 0.917,
+   "hybrid_retake_rate": 0.003,
+   "enhanced_rate": 0.003,
+   "det_mean_iou": 0.9350743247621318
+  },
+  "occlusion 25%": {
+   "classical_top1": 0.019,
+   "deep_top1": 0.853,
+   "hybrid_top1": 0.852,
+   "hybrid_retake_rate": 0.006,
+   "enhanced_rate": 0.003,
+   "det_mean_iou": 0.7967556711290505
+  },
+  "occlusion 40%": {
+   "classical_top1": 0.015,
+   "deep_top1": 0.76,
+   "hybrid_top1": 0.758,
+   "hybrid_retake_rate": 0.027,
+   "enhanced_rate": 0.005,
+   "det_mean_iou": 0.6579859135536738
+  },
+  "low-res 1/4": {
+   "classical_top1": 0.038,
+   "deep_top1": 0.793,
+   "hybrid_top1": 0.792,
+   "hybrid_retake_rate": 0.766,
+   "enhanced_rate": 0.004,
+   "det_mean_iou": 0.9382736482405726
+  },
+  "low-res 1/8": {
+   "classical_top1": 0.014,
+   "deep_top1": 0.389,
+   "hybrid_top1": 0.389,
+   "hybrid_retake_rate": 0.999,
+   "enhanced_rate": 0.005,
+   "det_mean_iou": 0.8992648590048395
+  },
+  "blur sigma 2": {
+   "classical_top1": 0.037,
+   "deep_top1": 0.842,
+   "hybrid_top1": 0.842,
+   "hybrid_retake_rate": 0.922,
+   "enhanced_rate": 0.004,
+   "det_mean_iou": 0.9386010470344136
+  },
+  "blur sigma 4": {
+   "classical_top1": 0.016,
+   "deep_top1": 0.509,
+   "hybrid_top1": 0.509,
+   "hybrid_retake_rate": 0.999,
+   "enhanced_rate": 0.005,
+   "det_mean_iou": 0.8953479553262955
+  },
+  "noise sigma 20": {
+   "classical_top1": 0.044,
+   "deep_top1": 0.914,
+   "hybrid_top1": 0.914,
+   "hybrid_retake_rate": 0.013,
+   "enhanced_rate": 0.001,
+   "det_mean_iou": 0.9303694293295841
+  }
+ },
+ "failure_candidates": {
+  "year_confusion": {
+   "index": 1586,
+   "id": "01587",
+   "true": "Honda Odyssey Minivan 2007",
+   "pred": "Honda Odyssey Minivan 2012",
+   "conf": 0.9995742440223694,
+   "det_iou": 0.9644393780859264,
+   "top3": [
+    "Honda Odyssey Minivan 2012",
+    "Honda Odyssey Minivan 2007",
+    "Lamborghini Reventon Coupe 2008"
+   ]
+  },
+  "confident_wrong_make": {
+   "index": 5249,
+   "id": "05250",
+   "true": "Dodge Durango SUV 2007",
+   "pred": "Chrysler Aspen SUV 2009",
+   "conf": 0.9982624650001526,
+   "det_iou": 0.9685820703200103,
+   "top3": [
+    "Chrysler Aspen SUV 2009",
+    "Dodge Durango SUV 2007",
+    "Infiniti QX56 SUV 2011"
+   ]
+  },
+  "bad_localisation": {
+   "index": 352,
+   "id": "00353",
+   "true": "Aston Martin V8 Vantage Convertible 2012",
+   "pred": "FIAT 500 Convertible 2012",
+   "conf": 0.2669321596622467,
+   "det_iou": 0.0,
+   "top3": [
+    "FIAT 500 Convertible 2012",
+    "Suzuki SX4 Hatchback 2012",
+    "Hyundai Veloster Hatchback 2012"
+   ]
+  },
+  "dark_image": {
+   "index": 2369,
+   "id": "02370",
+   "true": "Rolls-Royce Phantom Sedan 2012",
+   "pred": "Rolls-Royce Ghost Sedan 2012",
+   "conf": 0.4340892434120178,
+   "det_iou": 0.7264326117130722,
+   "top3": [
+    "Rolls-Royce Ghost Sedan 2012",
+    "Rolls-Royce Phantom Drophead Coupe Convertible 2012",
+    "Rolls-Royce Phantom Sedan 2012"
+   ]
+  },
+  "truncated_or_occluded": {
+   "index": 361,
+   "id": "00362",
+   "true": "Audi S5 Convertible 2012",
+   "pred": "BMW 1 Series Convertible 2012",
+   "conf": 0.21859118342399597,
+   "det_iou": 0.9811254504181376,
+   "top3": [
+    "BMW 1 Series Convertible 2012",
+    "Audi RS 4 Convertible 2008",
+    "Ford Mustang Convertible 2007"
+   ]
+  }
+ },
+ "latency": {
+  "load": 2.7,
+  "detect": 66.9,
+  "classical": 19.25,
+  "deep": 225.0,
+  "hybrid": 4.5,
+  "total": 321.35
+ }
+}

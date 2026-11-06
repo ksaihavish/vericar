@@ -15,6 +15,7 @@ import datetime as dt
 import json
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[0]))
@@ -74,7 +75,9 @@ def main():
     gts = {i: r["box"] for i, r in enumerate(test)}
     det_ft = detect_all(MODELS_DIR / "detector.pt", test)
     det_coco = detect_all("yolo11n.pt", test, coco=True)
-    cboxes = Parallel(n_jobs=10, batch_size=64)(delayed(_classical_box)(r["path"]) for r in test)
+    cboxes = Parallel(n_jobs=6, batch_size=64)(delayed(_classical_box)(r["path"]) for r in test)
+    from joblib.externals.loky import get_reusable_executor
+    get_reusable_executor().shutdown(wait=True)   # free the idle workers' RAM (~0.6 GB each)
     R["detection"] = {
         "YOLO11n fine-tuned (ours)": detection_report(flat(det_ft), gts),
         "YOLO11n COCO-pretrained": detection_report(flat(det_coco), gts),
@@ -88,11 +91,15 @@ def main():
     model = load_torch_classifier()
     svm = joblib.load(MODELS_DIR / "classical_svm.joblib")
     need_cls = w > 0
+    # CPU-only classical pipeline runs in a background thread while the GPU pipelines run
+    pool = ThreadPoolExecutor(max_workers=1)
+    fut_clas = pool.submit(run_set, CropSet(test, None, "classical", enhance=False, classical_feats=True), None, svm,
+                           64, 3)
     hyb = run_set(CropSet(test, boxes, "det", enhance=True, classical_feats=need_cls), model, svm)
     raw = run_set(CropSet(test, boxes, "det", enhance=False, classical_feats=need_cls), model, svm)
     full = run_set(CropSet(test, None, "full", enhance=True, classical_feats=need_cls), model, svm)
     gtc = run_set(CropSet(test, None, "gt", enhance=False), model)
-    clas = run_set(CropSet(test, None, "classical", enhance=False, classical_feats=True), None, svm)
+    clas = fut_clas.result()
 
     p_cls = clas["p_classical"]
     p_deep = softmax(raw["logits"])
@@ -187,11 +194,13 @@ def main():
     ys = y[idx]
     R["robustness"] = {}
     for name in PERTURBATIONS:
+        fut_c = pool.submit(run_set, CropSet(sub, None, "classical", classical_feats=True, perturb=name), None, svm,
+                            64, 3)
         d = detect_all(MODELS_DIR / "detector.pt", sub, perturb=name)
         b = [primary_box(x) for x in d]
         h = run_set(CropSet(sub, b, "det", enhance=True, classical_feats=need_cls, perturb=name), model, svm)
         r_ = run_set(CropSet(sub, b, "det", enhance=False, perturb=name), model)
-        c_ = run_set(CropSet(sub, None, "classical", classical_feats=True, perturb=name), None, svm)
+        c_ = fut_c.result()
         ph = fuse(h["logits"], T, h.get("p_classical"), w)
         R["robustness"][name] = {
             "classical_top1": float((c_["p_classical"].argmax(1) == ys).mean()),
