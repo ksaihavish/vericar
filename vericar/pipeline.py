@@ -47,6 +47,10 @@ class VeriCar:
         self.fusion_weight = meta["fusion_weight"]
         self.thr = Thresholds(**meta["thresholds"])
         self.ood = KnnOOD(np.load(models_dir / "ood_bank.npy"), k=meta["ood_k"], threshold=meta["ood_threshold"])
+        self.openset = None                      # optional zero-shot open-set fallback (vericar/openset.py)
+        if (models_dir / "openset.json").exists() and (models_dir / "openset_clip_int8.onnx").exists():
+            from .openset import OpenSet
+            self.openset = OpenSet(models_dir)
 
     # ------------------------------------------------------------------ helpers
     def _svm_probs(self, crop: np.ndarray) -> np.ndarray:
@@ -100,7 +104,11 @@ class VeriCar:
         p_svm_roi = self._svm_probs(enhanced) if self.fusion_weight > 0 else None
         p_hybrid = fuse(logits_h[0], self.temperature, p_svm_roi, self.fusion_weight)
         ood_score = float(self.ood.score(feats_h)[0])
-        unknown = ood_score > self.ood.threshold
+        reasons = ["looks unlike every training car"] if ood_score > self.ood.threshold else []
+        open_set = self.openset(enhanced) if self.openset is not None else None
+        if open_set is not None and open_set["flag"]:
+            reasons.append("closer to a post-2012 model than to any known class")
+        unknown = bool(reasons)
         thr = self.thr if identify_threshold is None else Thresholds(**{**self.thr.as_dict(),
                                                                          "identify": identify_threshold})
         if claim is None:
@@ -117,6 +125,7 @@ class VeriCar:
             "verdict": verdict.as_dict(),
             "quality": q.as_dict(), "enhancement": steps,
             "ood_score": ood_score, "ood_threshold": self.ood.threshold, "unknown": bool(unknown),
+            "unknown_reasons": reasons, "open_set": open_set,
             "guess": educated_guess(p_hybrid, self.hier),
             "p_hybrid": p_hybrid.astype(np.float32), "issues": issues,   # lets the UI re-threshold instantly
             "methods": {

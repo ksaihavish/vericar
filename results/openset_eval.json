@@ -1,0 +1,345 @@
+{
+ "model": "OpenCLIP ViT-B-32 (laion2b_s34b_b79k), zero-shot, image encoder ONNX INT8",
+ "vocab": {
+  "known": 196,
+  "modern": 343
+ },
+ "tau_p_modern": 0.8316360551118847,
+ "val_flag_rate": 0.030278232405891982,
+ "val_zero_shot_top1_196": 0.5540098199672667,
+ "posthoc_probe": {
+  "n": 25,
+  "flag_rate_clip": 0.6,
+  "flag_rate_knn": 0.64,
+  "flag_rate_combined": 0.92,
+  "top1_modern_name_acc": 0.16,
+  "top3_modern_name_acc": 0.52,
+  "rows": [
+   {
+    "file": "Audi_Q4_e_tron_1.jpg",
+    "truth": "Audi Q4 e-tron",
+    "p_modern": 0.9865097999572754,
+    "flag": true,
+    "top3": [
+     "Mercedes-Benz EQE",
+     "Kia EV6",
+     "Toyota bZ4X"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Audi_Q4_e_tron_2.jpg",
+    "truth": "Audi Q4 e-tron",
+    "p_modern": 0.9160311222076416,
+    "flag": true,
+    "top3": [
+     "Volkswagen Arteon",
+     "Mercedes-Benz GLA (2020)",
+     "Audi Q4 e-tron"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Ford_Mustang_Mach_E_1.jpg",
+    "truth": "Ford Mustang Mach-E",
+    "p_modern": 0.9620732069015503,
+    "flag": true,
+    "top3": [
+     "Volkswagen Virtus",
+     "Volkswagen Arteon",
+     "Kia EV6"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Ford_Mustang_Mach_E_2.jpg",
+    "truth": "Ford Mustang Mach-E",
+    "p_modern": 0.5931336879730225,
+    "flag": false,
+    "top3": [
+     "Mahindra Thar (2020)",
+     "Mercedes-Benz G-Class (2018)",
+     "Jeep Wrangler JL"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Hyundai_Creta_SU2_1.jpg",
+    "truth": "Hyundai Creta",
+    "p_modern": 0.9620363712310791,
+    "flag": true,
+    "top3": [
+     "Hyundai Creta (2020)",
+     "Toyota Urban Cruiser Hyryder",
+     "Toyota bZ4X"
+    ],
+    "top1_correct": true,
+    "top3_correct": true
+   },
+   {
+    "file": "Hyundai_Creta_SU2_2.jpg",
+    "truth": "Hyundai Creta",
+    "p_modern": 0.9961905479431152,
+    "flag": true,
+    "top3": [
+     "Hyundai Creta (2020)",
+     "Tata Harrier",
+     "MG Hector"
+    ],
+    "top1_correct": true,
+    "top3_correct": true
+   },
+   {
+    "file": "Hyundai_Ioniq_5_1.jpg",
+    "truth": "Hyundai Ioniq 5",
+    "p_modern": 0.8735854625701904,
+    "flag": true,
+    "top3": [
+     "Volkswagen Virtus",
+     "Volkswagen T-Roc",
+     "Skoda Enyaq"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Hyundai_Ioniq_5_2.jpg",
+    "truth": "Hyundai Ioniq 5",
+    "p_modern": 0.7447439432144165,
+    "flag": false,
+    "top3": [
+     "Audi A4 B9",
+     "Polestar Polestar 2",
+     "Audi A8 D5"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Kia_EV6_1.jpg",
+    "truth": "Kia EV6",
+    "p_modern": 0.955833375453949,
+    "flag": true,
+    "top3": [
+     "Polestar Polestar 2",
+     "Polestar Polestar 4",
+     "Kia EV6"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Kia_EV6_2.jpg",
+    "truth": "Kia EV6",
+    "p_modern": 0.9899066686630249,
+    "flag": true,
+    "top3": [
+     "Polestar Polestar 2",
+     "Polestar Polestar 4",
+     "Volkswagen Virtus"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Mahindra_XUV700_1.jpg",
+    "truth": "Mahindra XUV700",
+    "p_modern": 0.8100334405899048,
+    "flag": false,
+    "top3": [
+     "Peugeot 3008 (2017)",
+     "Honda Elevate",
+     "Mahindra XUV700"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Mahindra_XUV700_2.jpg",
+    "truth": "Mahindra XUV700",
+    "p_modern": 0.7446213364601135,
+    "flag": false,
+    "top3": [
+     "Volkswagen T-Roc",
+     "Toyota bZ4X",
+     "Volkswagen Virtus"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Porsche_Taycan_1.jpg",
+    "truth": "Porsche Taycan",
+    "p_modern": 0.6569474935531616,
+    "flag": false,
+    "top3": [
+     "Tesla Model S (2021)",
+     "Porsche Taycan",
+     "Lamborghini Revuelto"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Porsche_Taycan_2.jpg",
+    "truth": "Porsche Taycan",
+    "p_modern": 0.4728911817073822,
+    "flag": false,
+    "top3": [
+     "Porsche Panamera (2017)",
+     "Tesla Model 3",
+     "Porsche Taycan"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Tata_Nexon_1.jpg",
+    "truth": "Tata Nexon",
+    "p_modern": 0.9306851029396057,
+    "flag": true,
+    "top3": [
+     "Tata Nexon",
+     "Tata Altroz",
+     "Tata Nexon EV"
+    ],
+    "top1_correct": true,
+    "top3_correct": true
+   },
+   {
+    "file": "Tata_Nexon_2.jpg",
+    "truth": "Tata Nexon",
+    "p_modern": 0.989105224609375,
+    "flag": true,
+    "top3": [
+     "Volkswagen T-Roc",
+     "Volkswagen Virtus",
+     "Tata Nexon"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Tesla_Model_3_2.jpg",
+    "truth": "Tesla Model 3",
+    "p_modern": 0.6454945802688599,
+    "flag": false,
+    "top3": [
+     "Isuzu D-Max V-Cross",
+     "Volvo EX30",
+     "Isuzu MU-X"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Tesla_Model_Y_1.jpg",
+    "truth": "Tesla Model Y",
+    "p_modern": 0.2987019419670105,
+    "flag": false,
+    "top3": [
+     "Ferrari Purosangue",
+     "Porsche 718 Cayman",
+     "Tesla Model Y"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Tesla_Model_Y_2.jpg",
+    "truth": "Tesla Model Y",
+    "p_modern": 0.9148537516593933,
+    "flag": true,
+    "top3": [
+     "Tesla Model 3",
+     "Tesla Model Y",
+     "Ford Puma"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Toyota_GR86_1.jpg",
+    "truth": "Toyota GR86",
+    "p_modern": 0.5414928793907166,
+    "flag": false,
+    "top3": [
+     "Ferrari Purosangue",
+     "Porsche 718 Cayman",
+     "Hyundai Exter"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Toyota_GR86_2.jpg",
+    "truth": "Toyota GR86",
+    "p_modern": 0.622308611869812,
+    "flag": false,
+    "top3": [
+     "Ferrari Purosangue",
+     "Hyundai Exter",
+     "Audi A4 B9"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Toyota_RAV4_XA50_1.jpg",
+    "truth": "Toyota RAV4",
+    "p_modern": 0.9628230333328247,
+    "flag": true,
+    "top3": [
+     "Toyota Urban Cruiser Hyryder",
+     "Hyundai Exter",
+     "BYD Han"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Toyota_RAV4_XA50_2.jpg",
+    "truth": "Toyota RAV4",
+    "p_modern": 0.9982041120529175,
+    "flag": true,
+    "top3": [
+     "Toyota bZ4X",
+     "Toyota RAV4 (2019)",
+     "Toyota Urban Cruiser Hyryder"
+    ],
+    "top1_correct": false,
+    "top3_correct": true
+   },
+   {
+    "file": "Volkswagen_ID_4_1.jpg",
+    "truth": "Volkswagen ID.4",
+    "p_modern": 0.9957940578460693,
+    "flag": true,
+    "top3": [
+     "Volkswagen Arteon",
+     "Toyota bZ4X",
+     "Skoda Enyaq"
+    ],
+    "top1_correct": false,
+    "top3_correct": false
+   },
+   {
+    "file": "Volkswagen_ID_4_2.jpg",
+    "truth": "Volkswagen ID.4",
+    "p_modern": 0.9981696605682373,
+    "flag": true,
+    "top3": [
+     "Volkswagen ID.4",
+     "Volkswagen ID.3",
+     "Volkswagen Golf Mk8"
+    ],
+    "top1_correct": true,
+    "top3_correct": true
+   }
+  ]
+ }
+}

@@ -118,6 +118,10 @@ Hard-clone catch rate **98.32%**, easy-clone catch rate 100.00%, false-alarm rat
 
 Cars outside the dataset: 64.00% of 25 modern-car photos flagged UNKNOWN; AUROC kNN 0.950 vs max-softmax 0.958; in-dataset test flag rate 6.60%.
 
+### Open-set fallback (POST-HOC: added after the test run, not part of the frozen system above)
+
+OpenCLIP ViT-B-32 (laion2b_s34b_b79k), zero-shot, image encoder ONNX INT8; vocabulary of 196 known + 343 post-2012 names. Threshold on validation flags 3.03% of known cars. On 25 modern-car photos: kNN alone 64.00%, open-set alone 60.00%, **combined 92.00% flagged NOT IN RECORDS**; suggested name top-1 16.00%, top-3 52.00% (shown as unverified only).
+
 ## 7. Ablation study (test set)
 
 | Variant | Top-1 | ECE | Hard-clone catch | False alarms |

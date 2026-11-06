@@ -102,6 +102,15 @@ def main():
                   f"AUROC kNN {ud['auroc_knn']:.3f} vs max-softmax {ud['auroc_msp']:.3f}; in-dataset test flag rate "
                   f"{pct(ud['test_flag_rate'])}."]
 
+    OS = j("openset_eval.json")
+    if OS:
+        pp = OS["posthoc_probe"]
+        L += ["", "### Open-set fallback (POST-HOC: added after the test run, not part of the frozen system above)", "",
+              f"{OS['model']}; vocabulary of {OS['vocab']['known']} known + {OS['vocab']['modern']} post-2012 names. "
+              f"Threshold on validation flags {pct(OS['val_flag_rate'])} of known cars. On {pp['n']} modern-car photos: "
+              f"kNN alone {pct(pp['flag_rate_knn'])}, open-set alone {pct(pp['flag_rate_clip'])}, "
+              f"**combined {pct(pp['flag_rate_combined'])} flagged NOT IN RECORDS**; suggested name top-1 "
+              f"{pct(pp['top1_modern_name_acc'])}, top-3 {pct(pp['top3_modern_name_acc'])} (shown as unverified only)."]
     L += ["", "## 7. Ablation study (test set)", "",
           table(["Variant", "Top-1", "ECE", "Hard-clone catch", "False alarms"],
                 [[k, pct(v["top1"]), f"{v['ece']:.3f}", pct(v["catch_rate_hard"]), pct(v["false_alarm_rate"])]

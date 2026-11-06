@@ -15,6 +15,7 @@ The rubric gives 25 points to the demo and viva: *"every member can explain thei
 - *What is a hard clone?* For each class, the most similar other class: nearest class prototype in the CNN embedding space, computed from training images only.
 - *How do you know the car is outside the dataset?* Cosine kNN distance (k = 10) from the image's 768-d embedding to all training embeddings. The threshold is the 95th percentile of validation distances, so about 5% of known cars are also sent to a manual check. AUROC against modern-car photos is in the report.
 - *How did you avoid tuning on the test set?* Every parameter was frozen on validation. `evaluate_final.py` refuses to run twice, and `results/test_run.json` is the record.
+- *What happens with a 2024 car?* Two independent unknown checks: kNN distance to our training embeddings, and an open-source OpenCLIP ViT-B/32 model (zero-shot, not trained by us) that compares the photo with text names of our 196 classes plus 343 post-2012 models. On 25 modern-car photos, kNN alone flagged 64% and both together flagged 92%. CLIP's names are shown as unverified leads (top-3 right 52% of the time), never as an identification, and CLIP can only *send a car to manual check*, never clear one. We added it after the test run and say so.
 - *What does Gemini do?* Only wording: it writes the officer note from the structured verdict (text only), and gives a labelled "unverified" second opinion for UNKNOWN cars. It never changes a verdict, and the app works without it.
 
 ## 2. ML model training

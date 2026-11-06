@@ -34,8 +34,10 @@ flowchart TB
         H3 --> H5["fuse: temperature T + weight w<br/><i>hybrid.py · fuse</i>"]
         H4 --> H5
         H3 --> H6["kNN distance to train embeddings<br/><i>hybrid.py · KnnOOD</i>"]
+        H2 --> H8["open-set fallback: OpenCLIP ViT-B/32 zero-shot<br/>196 known + 343 post-2012 names<br/><i>openset.py · OpenSet</i>"]
         H5 --> H7{"verdict<br/><i>hybrid.py · verify / identify</i>"}
         H6 --> H7
+        H8 -->|"flag + unverified names"| H7
         H1 -->|issues| H7
     end
     CROP --> H1

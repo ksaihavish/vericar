@@ -36,6 +36,7 @@ def release():
     meta = json.loads((MODELS_DIR / "hybrid.json").read_text())
     files = ["detector.pt", "classifier.pt", meta["onnx_file"], "classical_svm.joblib", "ood_bank.npy",
              "hybrid.json", "classes.json"]
+    files += [f for f in ("openset_clip_int8.onnx", "openset_text.npy", "openset.json") if (MODELS_DIR / f).exists()]
     manifest = {f: sha256(MODELS_DIR / f) for f in files}
     MANIFEST.write_text(json.dumps(manifest, indent=1))
     paths = [str(MODELS_DIR / f) for f in files]

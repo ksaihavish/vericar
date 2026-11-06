@@ -175,6 +175,14 @@ with tab_check:
                 if v["status"] in ("LOW_CONFIDENCE", "UNKNOWN"):
                     html("".join(ui.candidate(c["label"], c["prob"]) for c in v["candidates"]))
 
+            if res["unknown"] and res.get("open_set"):
+                os_ = res["open_set"]
+                names = " · ".join(f"{ui.esc(t['label'])} <span class='p'>{t['prob']:.0%}</span>" for t in os_["top"])
+                why = "; ".join(res.get("unknown_reasons", []))
+                html(f'<div class="vc-note ai" style="margin-top:.8rem"><span class="k">Open-set fallback · OpenCLIP '
+                     f'ViT-B/32 zero-shot · unverified</span>Flagged because it {ui.esc(why)}. Possible post-2012 '
+                     f'matches: {names}. Use as a lead for the manual check, not as an identification.</div>')
+
             if llm.available():
                 with st.spinner("Writing the officer note…"):
                     note = note_cached(f"{hashlib.sha1(image_bytes).hexdigest()}|{claim}", res,
