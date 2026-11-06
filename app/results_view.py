@@ -17,7 +17,7 @@ import components as ui
 
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 MCOL = {"Classical": ui.METHOD["classical"], "Deep": ui.METHOD["deep"], "Hybrid (ours)": ui.METHOD["hybrid"]}
-CLAIM_COL = {"Legit claim": "#3987e5", "Hard clone": "#d95926", "Easy clone": "#199e70"}
+CLAIM_COL = {"Legit claim": "#2a78d6", "Hard clone": "#eb6834", "Easy clone": "#1baf7a"}
 
 
 @st.cache_data
@@ -31,11 +31,23 @@ def _layout(fig: go.Figure, height=300, y_title="", x_title="", pct_y=True) -> g
         height=height, margin=dict(l=8, r=8, t=30, b=8), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color=ui.INK2, size=12), hovermode="closest",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0, font=dict(color=ui.INK2)),
-        xaxis=dict(title=x_title, gridcolor=ui.GRID, zeroline=False, linecolor="#383835", tickfont=dict(color=ui.MUTED)),
-        yaxis=dict(title=y_title, gridcolor=ui.GRID, zeroline=False, linecolor="#383835", tickfont=dict(color=ui.MUTED),
+        xaxis=dict(title=x_title, gridcolor=ui.GRID, zeroline=False, linecolor=ui.AXIS, tickfont=dict(color=ui.MUTED)),
+        yaxis=dict(title=y_title, gridcolor=ui.GRID, zeroline=False, linecolor=ui.AXIS, tickfont=dict(color=ui.MUTED),
                    tickformat=".0%" if pct_y else None),
-        hoverlabel=dict(bgcolor="#111827", font_color=ui.INK),
+        hoverlabel=dict(bgcolor=ui.PANEL, bordercolor=ui.RULE, font_color=ui.INK), barcornerradius=4,
     )
+    return fig
+
+
+def hsv_figure(h: dict) -> go.Figure:
+    """Hue / saturation / value histograms of the crop (Pipeline tab)."""
+    fig = go.Figure()
+    for name, col in (("hue", "#2a78d6"), ("saturation", "#eb6834"), ("value", "#1baf7a")):
+        v = h[name]
+        fig.add_scatter(y=v / (v.sum() + 1e-9), mode="lines", name=name, line=dict(color=col, width=2),
+                        hovertemplate=f"{name} bin %{{x}}: %{{y:.1%}}<extra></extra>")
+    fig = _layout(fig, 230, "", "bin")
+    fig.update_yaxes(tickformat=".0%")
     return fig
 
 
@@ -97,7 +109,7 @@ def render_results() -> None:
             st.plotly_chart(_layout(fig, 300, "Top-1 accuracy").update_layout(showlegend=False, yaxis_range=[0, 1.08]),
                             config={"displayModeBar": False})
         with c2:
-            st.markdown("**Per level** - most mistakes are look-alikes inside the same make")
+            st.markdown("**Where the mistakes are**: most are look-alikes inside the same make")
             eb = final["similar_classes"]["error_breakdown"]
             st.markdown(ui.kpi("Errors that are same model, other year", _pct(eb["same_model_other_year"])),
                         unsafe_allow_html=True)
@@ -140,7 +152,7 @@ def render_results() -> None:
             colr, icon, tag = ui.STATUS[s]
             fig.add_bar(y=["Legit claim", "Hard clone", "Easy clone"],
                         x=[ver["legit"][s], ver["hard_clone"][s], ver["easy_clone"][s]], orientation="h",
-                        name=f"{icon} {s}", marker=dict(color=colr, line=dict(color="#0A0F1C", width=2)),
+                        name=f"{icon} {s}", marker=dict(color=colr, line=dict(color=ui.PANEL, width=2)),
                         hovertemplate=f"{s}: %{{x:.1%}}<extra></extra>")
         fig.update_layout(barmode="stack")
         st.plotly_chart(_layout(fig, 250, "", "Share of claims", pct_y=False).update_xaxes(tickformat=".0%"),
@@ -198,9 +210,9 @@ def render_results() -> None:
             h = pd.DataFrame(hist)
             h["step"] = range(1, len(h) + 1)
             fig = go.Figure()
-            for col, name, colr, dash in (("train_top1_aug", "Train (augmented batches)", "#3987e5", "solid"),
-                                          ("train_top1_clean", "Train (clean subset)", "#3987e5", "dot"),
-                                          ("val_top1", "Validation", "#d95926", "solid")):
+            for col, name, colr, dash in (("train_top1_aug", "Train (augmented batches)", "#2a78d6", "solid"),
+                                          ("train_top1_clean", "Train (clean subset)", "#2a78d6", "dot"),
+                                          ("val_top1", "Validation", "#eb6834", "solid")):
                 fig.add_scatter(x=h["step"], y=h[col], mode="lines+markers", name=name, line=dict(color=colr, width=2, dash=dash),
                                 marker=dict(size=8), customdata=h["stage"],
                                 hovertemplate=f"{name}<br>epoch %{{x}} (%{{customdata}})<br>%{{y:.1%}}<extra></extra>")
@@ -214,7 +226,7 @@ def render_results() -> None:
         fig = go.Figure()
         for key, name in (("classical_top1", "Classical"), ("deep_top1", "Deep"), ("hybrid_top1", "Hybrid (ours)")):
             fig.add_scatter(y=names, x=[rb[n][key] for n in names], mode="markers", name=name,
-                            marker=dict(color=MCOL[name], size=11, line=dict(color="#0A0F1C", width=2)),
+                            marker=dict(color=MCOL[name], size=11, line=dict(color=ui.PANEL, width=2)),
                             hovertemplate=f"{name}<br>%{{y}}: %{{x:.1%}}<extra></extra>")
         fig.update_yaxes(autorange="reversed")
         st.plotly_chart(_layout(fig, 460, "", "Top-1 accuracy", pct_y=False).update_xaxes(tickformat=".0%", range=[0, 1]),

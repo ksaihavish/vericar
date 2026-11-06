@@ -130,24 +130,24 @@ def verify(probs: np.ndarray, claim: int, hier: Hierarchy, thr: Thresholds,
                        + ", ".join(quality_issues) + ".", levels, cands)
     if unknown:
         g = educated_guess(probs, hier)
-        return Verdict("UNKNOWN", "Cannot verify - car not in my knowledge",
+        return Verdict("UNKNOWN", "Cannot verify — car not in my knowledge",
                        f"This car does not resemble any of the 196 models I was trained on. Educated guess: "
                        f"{g['make']} ({g['make_prob']:.0%}), body {g['body']}. Manual check required.", levels, cands)
     if p_exact >= thr.match and int(np.argmax(probs)) == claim:   # never clear a claim that is not the top guess
-        return Verdict("MATCH", "Match - registration verified",
+        return Verdict("MATCH", "Match — registration verified",
                        f"The photo matches {claimed['label']} ({p_exact:.0%}).", levels, cands)
     if p_model >= thr.model:
         alt = [c for c in cands if c["class_idx"] != claim and hier.model_of[c["class_idx"]] == hier.model_of[claim]]
         alt_txt = f" vs {alt[0]['year']} ({alt[0]['prob']:.0%})" if alt else ""
-        return Verdict("PARTIAL", "Partial match - year not verifiable",
+        return Verdict("PARTIAL", "Partial match — year not verifiable",
                        f"Make and model verified ({p_model:.0%}). The year cannot be separated from this photo: "
                        f"{claimed['year']} ({p_exact:.0%}){alt_txt}. Check documents for the year.", levels, cands)
     if p_model < thr.mismatch:
         top = cands[0]
-        return Verdict("MISMATCH", "Mismatch - possible cloned plate",
+        return Verdict("MISMATCH", "Mismatch — possible cloned plate",
                        f"The photo looks like {top['label']} ({top['prob']:.0%}), not the registered "
                        f"{claimed['label']} ({p_exact:.1%}).", levels, cands)
-    return Verdict("INSPECT", "Inconclusive - manual check",
+    return Verdict("INSPECT", "Inconclusive — manual check",
                    f"Evidence for {claimed['label']} is {p_exact:.0%}; not strong enough to clear or to flag.",
                    levels, cands)
 
@@ -166,5 +166,5 @@ def identify(probs: np.ndarray, hier: Hierarchy, thr: Thresholds, unknown: bool 
                        f"({g['make_prob']:.0%}), {g['body']}; closest known: {g['closest']}.", [], cands)
     if top["prob"] >= thr.identify:
         return Verdict("CONFIDENT", top["label"], f"{top['prob']:.0%} confident.", [], cands)
-    return Verdict("LOW_CONFIDENCE", "Low confidence - top candidates",
+    return Verdict("LOW_CONFIDENCE", "Low confidence — top candidates",
                    f"Best guess {top['label']} at only {top['prob']:.0%}; showing the top 3.", [], cands)

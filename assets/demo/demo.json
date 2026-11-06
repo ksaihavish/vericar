@@ -7,38 +7,38 @@
  },
  {
   "file": "2_year_s4.jpg",
-  "title": "Which year?",
+  "title": "Year?",
   "claim": "Audi S4 Sedan 2012",
   "note": "Registered as a 2012 S4. The 2007 and 2012 S4 look almost identical."
  },
  {
   "file": "3_modern_taycan.jpg",
-  "title": "Modern car",
+  "title": "New car",
   "claim": null,
   "note": "Porsche Taycan (2019+), newer than anything in Stanford Cars (dataset ends 2012). Photo: S5A-0043, CC BY 4.0, Wikimedia Commons.",
   "source": "https://commons.wikimedia.org/wiki/File:(SGP-Singapore)_Private_Porsche_Taycan_SNG6166G_2024-11-06.jpg"
  },
  {
   "file": "4_match_m3.jpg",
-  "title": "Clean match",
+  "title": "Match",
   "claim": "BMW M3 Coupe 2012",
   "note": "Registration and photo agree."
  },
  {
   "file": "5_dark_m3.jpg",
-  "title": "Night shot",
+  "title": "Night",
   "claim": "BMW M3 Coupe 2012",
   "note": "Same car, simulated night-time exposure (x0.3)."
  },
  {
   "file": "6_low_conf.jpg",
-  "title": "Hard case",
+  "title": "Hard",
   "claim": null,
   "note": "True class: Eagle Talon Hatchback 1998. Watch the top-3 instead of a single guess."
  },
  {
   "file": "7_modern_xuv700.jpg",
-  "title": "Indian SUV",
+  "title": "XUV700",
   "claim": null,
   "note": "Mahindra XUV700 (2021+), a model the training data has never seen. Photo: LuvsMG481, CC BY-SA 4.0, Wikimedia Commons.",
   "source": "https://commons.wikimedia.org/wiki/File:2023_Mahindra_XUV700_AX7L_rear.jpg"

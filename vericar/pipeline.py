@@ -118,6 +118,7 @@ class VeriCar:
             "quality": q.as_dict(), "enhancement": steps,
             "ood_score": ood_score, "ood_threshold": self.ood.threshold, "unknown": bool(unknown),
             "guess": educated_guess(p_hybrid, self.hier),
+            "p_hybrid": p_hybrid.astype(np.float32), "issues": issues,   # lets the UI re-threshold instantly
             "methods": {
                 "classical": top_candidates(p_classical, self.hier, 5),
                 "deep": top_candidates(p_deep, self.hier, 5),
