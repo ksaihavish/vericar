@@ -105,7 +105,7 @@ See the About tab ([`about.md`](about.md)). In short: the dataset ends at 2012 a
 
 ## 10. Deployment
 
-Docker image (`Dockerfile`, CPU torch) on Hugging Face Spaces. The models are downloaded from the GitHub release at build time and verified with SHA-256. One-command local run: `run.ps1` / `run.sh`. The Gemini key is a host secret and is never committed.
+Streamlit Community Cloud, deployed from this GitHub repo (Hugging Face now requires a paid plan for Docker Spaces). The app downloads the models from the GitHub release on first start and verifies them with SHA-256; Linux hosts get the CPU-only PyTorch wheel. A `Dockerfile` is provided for any other host. One-command local run: `run.ps1` / `run.sh`. The Gemini key is a host secret and is never committed.
 
 ## 11. Team and contributions
 

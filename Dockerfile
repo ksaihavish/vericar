@@ -11,8 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cpu \
-    && pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 RUN python scripts/download_models.py

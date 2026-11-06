@@ -25,8 +25,13 @@ st.markdown(ui.CSS, unsafe_allow_html=True)
 
 
 # ------------------------------------------------------------------ cached resources
-@st.cache_resource(show_spinner="Loading models (first start only)…")
+@st.cache_resource(show_spinner="Downloading and loading models (first start only, ~1 min)…")
 def engine():
+    import runpy
+    # hosts without a build step (e.g. Streamlit Community Cloud): fetch + SHA-256-verify the release files
+    dl = runpy.run_path(str(ROOT / "scripts" / "download_models.py"))
+    if dl["main"]() != 0:
+        raise RuntimeError("model download failed")
     from vericar.pipeline import VeriCar
     return VeriCar()
 
@@ -50,9 +55,6 @@ def to_jpeg(img: np.ndarray) -> bytes:
 
 # ------------------------------------------------------------------ header
 st.markdown(ui.hero(), unsafe_allow_html=True)
-if not (MODELS_DIR / "hybrid.json").exists():
-    st.error("Model files are missing. Run `python scripts/download_models.py` (the launchers do this for you).")
-    st.stop()
 
 try:
     eng = engine()

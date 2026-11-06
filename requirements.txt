@@ -8,8 +8,11 @@ scikit-learn==1.9.1
 scikit-image==0.26.0
 joblib==1.6.0
 onnxruntime==1.31.1
-torch==2.11.0
-torchvision==0.26.0
+# CPU-only PyTorch on Linux hosts (avoids ~2.5 GB of CUDA libraries); normal wheels elsewhere.
+torch @ https://download.pytorch.org/whl/cpu/torch-2.11.0%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl ; sys_platform == "linux" and platform_machine == "x86_64"
+torch==2.11.0 ; sys_platform != "linux"
+torchvision @ https://download.pytorch.org/whl/cpu/torchvision-0.26.0%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl ; sys_platform == "linux" and platform_machine == "x86_64"
+torchvision==0.26.0 ; sys_platform != "linux"
 timm==1.0.31
 ultralytics==8.4.203
 streamlit==1.67.0
