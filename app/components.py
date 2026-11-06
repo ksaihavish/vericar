@@ -106,7 +106,7 @@ def gauge(prob: float, threshold: float, colour: str) -> go.Figure:
                "bar": {"color": colour, "thickness": 0.28}, "bgcolor": "#111827", "borderwidth": 0,
                "threshold": {"line": {"color": "#F8FAFC", "width": 3}, "thickness": 0.8, "value": threshold * 100}},
         title={"text": "Confidence (white line = threshold)", "font": {"size": 13, "color": "#94A3B8"}}))
-    fig.update_layout(height=210, margin=dict(l=20, r=20, t=40, b=0), paper_bgcolor="rgba(0,0,0,0)")
+    fig.update_layout(height=210, margin=dict(l=34, r=40, t=40, b=0), paper_bgcolor="rgba(0,0,0,0)")
     return fig
 
 

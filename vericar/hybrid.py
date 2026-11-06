@@ -114,7 +114,8 @@ def verify(probs: np.ndarray, claim: int, hier: Hierarchy, thr: Thresholds,
     p_make = float(probs[hier.make_of == hier.make_of[claim]].sum())
     p_model = float(probs[hier.model_of == hier.model_of[claim]].sum())
     p_exact = float(probs[claim])
-    p_year = p_exact / p_model if p_model > 1e-9 else 0.0
+    # P(year | model) only means something once the model itself is plausible
+    p_year = p_exact / p_model if p_model >= thr.mismatch else p_exact
     levels = [
         {"level": "Make", "claimed": claimed["make"], "prob": p_make},
         {"level": "Model", "claimed": claimed["model"].removeprefix(claimed["make"]).strip(), "prob": p_model},
