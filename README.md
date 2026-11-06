@@ -36,7 +36,7 @@ Full tables (robustness, ablation, optimisation, confidence, failure cases) are 
 
 ## Run it (one command)
 
-Windows:
+Windows: double-click **`start.bat`**, or:
 
 ```bash
 powershell -ExecutionPolicy Bypass -File run.ps1

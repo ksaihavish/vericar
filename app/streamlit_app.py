@@ -1,6 +1,7 @@
 """VeriCar Streamlit app - a thin UI over ``VeriCar().analyze``."""
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import sys
@@ -45,6 +46,24 @@ def demo_items() -> list[dict]:
 def ref_image(idx: int):
     p = ASSETS_DIR / "ref" / f"{idx:03d}.jpg"
     return str(p) if p.exists() else None
+
+
+@st.cache_data(max_entries=48, show_spinner=False)
+def analyze_cached(image_bytes: bytes, claim, id_thr, gradcam: bool) -> dict:
+    """Streamlit re-runs the script on every click; cache per (photo, claim, threshold, Grad-CAM)."""
+    return engine().analyze(Image.open(io.BytesIO(image_bytes)), claim=claim, identify_threshold=id_thr,
+                            gradcam=gradcam)
+
+
+@st.cache_data(max_entries=96, show_spinner=False)
+def note_cached(key: str, _res: dict, claim_label):
+    """At most one Gemini call per (photo, claim) - quota-friendly; errors return None (panel hidden)."""
+    return llm.officer_note(_res, claim_label)
+
+
+@st.cache_data(max_entries=96, show_spinner=False)
+def opinion_cached(key: str, _jpeg: bytes, _guess: dict):
+    return llm.second_opinion(_jpeg, _guess)
 
 
 def to_jpeg(img: np.ndarray) -> bytes:
@@ -147,7 +166,7 @@ with tab_verify:
                 st.stop()
             try:
                 with st.spinner("Detecting, classifying and verifying…"):
-                    res = eng.analyze(pil, claim=claim, identify_threshold=id_thr, gradcam=show_cam)
+                    res = analyze_cached(image_bytes, claim, id_thr, show_cam)
             except Exception as e:  # pragma: no cover
                 st.error(f"Analysis failed: {e}")
                 st.stop()
@@ -196,13 +215,14 @@ with tab_verify:
             if use_llm:
                 with st.spinner("Writing the officer note…"):
                     claim_label = hier.class_names[claim] if claim is not None else None
-                    note = llm.officer_note(res, claim_label)
+                    note = note_cached(f"{hashlib.sha1(image_bytes).hexdigest()}|{claim}", res, claim_label)
                 if note:
                     st.markdown(f'<div class="vc-note"><b>Officer note</b> · AI-written from the verdict above<br>'
                                 f'{ui.esc(note)}</div>', unsafe_allow_html=True)
                 if res["unknown"]:
                     with st.spinner("Asking for a second opinion…"):
-                        op = llm.second_opinion(to_jpeg(res["images"]["crop"]), res["guess"])
+                        op = opinion_cached(hashlib.sha1(image_bytes).hexdigest(), to_jpeg(res["images"]["crop"]),
+                                            res["guess"])
                     if op:
                         st.markdown(f'<div class="vc-note vc-ai"><b>AI second opinion · unverified</b><br>'
                                     f'{ui.esc(op)}</div>', unsafe_allow_html=True)
