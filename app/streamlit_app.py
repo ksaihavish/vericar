@@ -131,7 +131,7 @@ with tab_check:
             for i, d in enumerate(demos):
                 with cols[i % len(cols)]:
                     thumb = ASSETS_DIR / "demo" / "thumbs" / d["file"]
-                    st.image(str(thumb if thumb.exists() else ASSETS_DIR / "demo" / d["file"]), width="stretch")
+                    st.image(str(thumb if thumb.exists() else ASSETS_DIR / "demo" / d["file"]), width="stretch", alt=d.get("note", d["title"]))
                     st.button(d["title"], key=f"demo{i}", width="stretch", on_click=pick_demo, args=(d,),
                               type="primary" if st.session_state.demo == d else "secondary")
         if st.session_state.demo is not None and f is None:
@@ -191,10 +191,10 @@ with tab_check:
 
             html(ui.section("4", "Evidence", f"{res['timings_ms']['total']:.0f} ms"))
             a, b = st.columns([1.5, 1])
-            a.image(res["images"]["annotated"], width="stretch",
+            a.image(res["images"]["annotated"], width="stretch", alt="Photo with the detected vehicle boxed and labelled",
                     caption=f"Detected vehicle ({res['box_source']}, score {res['det_score']:.2f})")
             if "gradcam" in res["images"]:
-                b.image(res["images"]["gradcam"], width="stretch", caption="Where the model looked (Grad-CAM)")
+                b.image(res["images"]["gradcam"], width="stretch", caption="Where the model looked (Grad-CAM)", alt="Grad-CAM heat map over the car")
             html('<div class="vc-cap" style="margin:.8rem 0 .4rem">LOOK-ALIKES: the most typical training photo '
                  'of each top candidate</div>')
             cols = st.columns(3)
@@ -202,7 +202,7 @@ with tab_check:
                 with col:
                     r = ref_image(cand["class_idx"])
                     if r:
-                        st.image(r, width="stretch")
+                        st.image(r, width="stretch", alt=f"Typical training photo of {cand['label']}")
                     html(ui.candidate(cand["label"], cand["prob"]))
 
 # ================================================================== PIPELINE
