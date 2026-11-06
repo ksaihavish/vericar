@@ -34,12 +34,14 @@ def sha256(p: Path) -> str:
 
 def release():
     meta = json.loads((MODELS_DIR / "hybrid.json").read_text())
-    files = ["detector.pt", "classifier.pt", meta["onnx_file"], "classical_svm.joblib", "ood_bank.npy",
+    # runtime files (what the app downloads; no PyTorch needed) + training checkpoints (scripts only)
+    files = ["detector.onnx", meta["onnx_file"], "cam_weights.npy", "classical_svm.joblib", "ood_bank.npy",
              "hybrid.json", "classes.json"]
     files += [f for f in ("openset_clip_int8.onnx", "openset_text.npy", "openset.json") if (MODELS_DIR / f).exists()]
+    extras = ["detector.pt", "classifier.pt"]
     manifest = {f: sha256(MODELS_DIR / f) for f in files}
     MANIFEST.write_text(json.dumps(manifest, indent=1))
-    paths = [str(MODELS_DIR / f) for f in files]
+    paths = [str(MODELS_DIR / f) for f in files + extras]
     exists = subprocess.run(["gh", "release", "view", TAG, "-R", REPO], capture_output=True).returncode == 0
     if exists:
         subprocess.run(["gh", "release", "upload", TAG, *paths, "-R", REPO, "--clobber"], check=True)

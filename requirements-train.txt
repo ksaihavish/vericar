@@ -2,6 +2,13 @@
 # Install a CUDA build of torch first, e.g.:
 #   pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
 -r requirements.txt
+# CPU-only PyTorch on Linux hosts (avoids ~2.5 GB of CUDA libraries); normal wheels elsewhere.
+torch @ https://download.pytorch.org/whl/cpu/torch-2.11.0%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl ; sys_platform == "linux" and platform_machine == "x86_64"
+torch==2.11.0 ; sys_platform != "linux"
+torchvision @ https://download.pytorch.org/whl/cpu/torchvision-0.26.0%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl ; sys_platform == "linux" and platform_machine == "x86_64"
+torchvision==0.26.0 ; sys_platform != "linux"
+timm==1.0.31
+ultralytics==8.4.203
 kagglehub==1.0.3
 onnx==1.23.2
 onnxconverter-common==1.16.0

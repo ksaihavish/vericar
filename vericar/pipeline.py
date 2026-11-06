@@ -38,7 +38,10 @@ class VeriCar:
         meta = json.loads((models_dir / "hybrid.json").read_text())
         self.meta = meta
         self.hier = Hierarchy.from_names(meta["class_names"])
-        self.detector = Detector(models_dir / "detector.pt")
+        det = models_dir / "detector.onnx"            # ONNX: no PyTorch needed at runtime
+        self.detector = Detector(det if det.exists() else models_dir / "detector.pt")
+        cw = models_dir / "cam_weights.npy"
+        self.cam_weights = np.load(cw) if cw.exists() else None
         onnx = models_dir / (onnx_file or meta.get("onnx_file", "classifier.onnx"))
         self.classifier = Classifier(onnx_path=onnx, torch_path=models_dir / "classifier.pt")
         import joblib
@@ -150,9 +153,13 @@ class VeriCar:
                 "classical_crop": crop_box(img, croi["box"], 0.0),
             }
             out["histograms"] = cl.hsv_histograms(crop)
-        if gradcam:
-            out.setdefault("images", {})["gradcam"] = overlay_cam(enhanced, self.classifier.gradcam(
-                x_h, int(top[0]["class_idx"])))
+        cam = None
+        if self.cam_weights is not None:          # CAM from the ONNX forward pass: free, no PyTorch
+            cam = self.classifier.cam(int(top[0]["class_idx"]), enhanced.shape[:2], self.cam_weights)
+        if cam is None and gradcam:               # fallback: PyTorch Grad-CAM (offline / old model files)
+            cam = self.classifier.gradcam(x_h, int(top[0]["class_idx"]))
+        if cam is not None:
+            out.setdefault("images", {})["gradcam"] = overlay_cam(enhanced, cam)
         return out
 
 

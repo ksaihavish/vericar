@@ -212,7 +212,7 @@ with tab_check:
                 b.markdown('<div class="vc-cap">Highlights the image regions that drove the prediction. ' 
                            'Takes a few seconds on the free server.</div>', unsafe_allow_html=True)
             else:
-                b.image(res["images"]["gradcam"], width="stretch", caption="Where the model looked (Grad-CAM)", alt="Grad-CAM heat map over the car")
+                b.image(res["images"]["gradcam"], width="stretch", caption="Where the model looked (class activation map)", alt="Heat map of the regions that drove the prediction")
             html('<div class="vc-cap" style="margin:.8rem 0 .4rem">LOOK-ALIKES: the most typical training photo '
                  'of each top candidate</div>')
             cols = st.columns(3)

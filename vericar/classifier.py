@@ -17,6 +17,8 @@ from .preprocessing import crop_box, normalize_for_model
 
 import threading
 
+import cv2
+
 MODEL_NAME = "convnext_tiny.fb_in22k_ft_in1k"
 _CAM_LOCK = threading.Lock()
 TOP_STAGES = ("stages.2", "stages.3", "head")   # unfrozen in stage 2 (head = final norm)
@@ -170,12 +172,27 @@ class Classifier:
 
     def predict(self, x: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         if self.onnx is not None:
-            logits, feats = self.onnx.run(None, {self.input_name: x.astype(np.float32)})
-            return logits.astype(np.float32), feats.astype(np.float32)
+            outs = self.onnx.run(None, {self.input_name: x.astype(np.float32)})
+            self.last_fmap = outs[2] if len(outs) > 2 else None   # last-stage feature map, for CAM
+            return outs[0].astype(np.float32), outs[1].astype(np.float32)
         import torch
         with torch.inference_mode():
             logits, feats = self._load_torch()(torch.from_numpy(x))
         return logits.numpy(), feats.numpy()
+
+    def cam(self, class_idx: int, size: tuple[int, int], cam_weights: np.ndarray) -> np.ndarray | None:
+        """Class Activation Map from the last forward pass (no gradients, no PyTorch).
+
+        ConvNeXt ends in global-average-pool -> LayerNorm -> linear, so the class score
+        decomposes over spatial positions: CAM_c(x, y) ~ sum_k (w_ck * gamma_k) F_k(x, y).
+        """
+        fm = getattr(self, "last_fmap", None)
+        if fm is None:
+            return None
+        cam = np.tensordot(cam_weights[class_idx].astype(np.float32), fm[0].astype(np.float32), axes=(0, 0))
+        cam = np.maximum(cam - np.median(cam), 0)
+        cam = cv2.resize(cam, (size[1], size[0]), interpolation=cv2.INTER_CUBIC)
+        return (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
 
     def gradcam(self, x: np.ndarray, class_idx: int) -> np.ndarray:
         """Grad-CAM heat-map (H x W in [0,1]) from the last ConvNeXt stage (one at a time: ~0.5 GB peak)."""
