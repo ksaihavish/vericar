@@ -46,6 +46,9 @@ class Detector:
 
 
 def _cuda() -> bool:
+    import os
+    if os.environ.get("VERICAR_CPU") == "1":
+        return False
     try:
         import torch
         return torch.cuda.is_available()

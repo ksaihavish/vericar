@@ -42,9 +42,10 @@ def main():
     from ultralytics import YOLO
     yaml = build_yolo_dataset()
     model = YOLO("yolo11n.pt")
-    model.train(data=str(yaml), epochs=25, patience=5, imgsz=640, batch=32, seed=SEED, deterministic=False,
+    # one large car per image, single class: converges quickly; 12 epochs keeps the laptop budget sane
+    model.train(data=str(yaml), epochs=12, patience=4, imgsz=640, batch=32, seed=SEED, deterministic=False,
                 project=str(RUNS_DIR), name="detector", exist_ok=True, workers=6, cos_lr=True,
-                close_mosaic=5, plots=True, verbose=False)
+                close_mosaic=3, plots=True, verbose=False)
     best = RUNS_DIR / "detector" / "weights" / "best.pt"
     shutil.copy2(best, MODELS_DIR / "detector.pt")
     print("saved", MODELS_DIR / "detector.pt", flush=True)

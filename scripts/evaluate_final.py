@@ -26,7 +26,7 @@ from joblib import Parallel, delayed  # noqa: E402
 
 from common import CropSet, PERTURBATIONS, detect_all, load_torch_classifier, primary_box, run_set  # noqa: E402
 from vericar import classical as cl  # noqa: E402
-from vericar.config import DATA_DIR, MODELS_DIR, REPO_ROOT, RESULTS_DIR, SEED  # noqa: E402
+from vericar.config import DATA_DIR, MODELS_DIR, REPO_ROOT, RESULTS_DIR, RUNS_DIR, SEED  # noqa: E402
 from vericar.data import hierarchy, load_split  # noqa: E402
 from vericar.evaluation import (confused_pairs, coverage_curve, detection_report, ece, iou, level_accuracy,  # noqa: E402
                                 auroc, claim_sets, cleared_rate, clone_study, topk_accuracy,
@@ -218,6 +218,17 @@ def main():
                                    "pred": hier.class_names[pred[i]], "conf": float(conf[i]), "det_iou": float(det_iou[i]),
                                    "top3": [hier.class_names[j] for j in np.argsort(-p_hyb[i])[:3]]}
                                for k, i in cands.items()}
+
+    # ---------------------------------------------------------------- H. deployed pipeline latency (CPU)
+    import os
+    import shutil
+    os.environ["VERICAR_CPU"] = "1"
+    from vericar.pipeline import VeriCar
+    eng = VeriCar(MODELS_DIR)
+    eng.analyze(test[0]["path"])  # warm-up
+    tims = [eng.analyze(test[i]["path"])["timings_ms"] for i in idx[:20]]
+    R["latency"] = {k: float(np.median([t[k] for t in tims])) for k in tims[0]}
+    shutil.copy2(RUNS_DIR / "classifier" / "history.json", RESULTS_DIR / "training_history.json")
 
     # ---------------------------------------------------------------- save
     np.savez_compressed(DATA_DIR / "test_outputs.npz", p_hyb=p_hyb.astype(np.float32), p_deep=p_deep.astype(np.float32),
