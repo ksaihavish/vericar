@@ -56,6 +56,8 @@ def main() -> int:
                    "confidence": round(r["confidence"], 4), "unknown": r["unknown"],
                    "unknown_reasons": r["unknown_reasons"],
                    "methods_top1": {k: v[0]["label"] for k, v in r["methods"].items()},
+                   "other_vehicles": [{k: o[k] for k in ("box", "status", "label", "confidence", "unknown")}
+                                      for o in r["other_vehicles"]],
                    "timings_ms": r["timings_ms"]}
             out.write(json.dumps(rec) + "\n")
             print(f"{p.name}: {rec['verdict']:14s} {rec['make_model_year']} ({rec['confidence']:.0%})")

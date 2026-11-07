@@ -9,7 +9,7 @@
 VeriCar is built for a parking or fleet officer who needs to answer one question: *"Does this car match what its registration says?"*
 Cloned plates are usually put on a car that looks like the registered one, so the system:
 
-- identifies the car with a hybrid classical + deep pipeline (YOLO detection → ConvNeXt classifier, with classical preprocessing, quality checks and features fused in),
+- detects **every car in the photo** and identifies each one (numbered on the image) with a hybrid classical + deep pipeline (YOLO detection → ConvNeXt classifier, with classical preprocessing, quality checks and features fused in),
 - **verifies a claimed registration level by level** (make → model → year) and returns **MATCH, PARTIAL, MISMATCH, INSPECT, UNKNOWN or RETAKE**,
 - is tuned **strict**: clearing a cloned car costs more than a manual check, so thresholds are set for a high clone-catch rate, and the resulting false-alarm rate is reported,
 - shows **why**: competing look-alike classes side by side, Grad-CAM, and every classical intermediate step,

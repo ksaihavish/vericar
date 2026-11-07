@@ -23,7 +23,7 @@ The system should detect multiple cars in an image, identify each vehicle separa
 
 We framed the problem around a concrete user: a parking or fleet officer checking whether a car matches its **registration** (cloned plates are deliberately put on look-alike cars). The question becomes "does this photo match the claimed make → model → year?", which turns the fine-grained difficulty into the core of the task. Stanford Cars stops at 2012, so the system must also recognise when a car is **outside its knowledge** instead of forcing one of the 196 labels.
 
-* **Proposed Methodology:** A fine-tuned YOLO11n detector localises the car. A fine-tuned ConvNeXt-Tiny classifies the crop into the 196 Stanford Cars classes, and classical computer vision runs around it: a quality gate, adaptive contrast/gamma enhancement, a contour-based fallback ROI and handcrafted features. The probabilities are temperature-calibrated and summed into make, model and year levels, so a claimed registration is verified **level by level** with strict, validation-fitted thresholds (MATCH / PARTIAL / INSPECT / MISMATCH), and two independent unknown-car checks produce "not in records" for cars the model was never trained on. We chose this adaptive, calibrated design over a static top-1 classifier: a confident wrong label is the costly error in this use case, and the system has to know when to refuse.
+* **Proposed Methodology:** A fine-tuned YOLO11n detector localises every car in the photo (each confident detection, up to six, is classified and numbered separately). A fine-tuned ConvNeXt-Tiny classifies the crop into the 196 Stanford Cars classes, and classical computer vision runs around it: a quality gate, adaptive contrast/gamma enhancement, a contour-based fallback ROI and handcrafted features. The probabilities are temperature-calibrated and summed into make, model and year levels, so a claimed registration is verified **level by level** with strict, validation-fitted thresholds (MATCH / PARTIAL / INSPECT / MISMATCH), and two independent unknown-car checks produce "not in records" for cars the model was never trained on. We chose this adaptive, calibrated design over a static top-1 classifier: a confident wrong label is the costly error in this use case, and the system has to know when to refuse.
 
 ---
 
@@ -93,7 +93,7 @@ Official Stanford Cars test set, 8,041 images, evaluated once (full tables: `doc
 | :---- | :---: | :---: | :---: | :---: | :---: |
 | **Classical Baseline** (contour ROI + handcrafted features + SVM) | 5.7% | 15.3% | 0.640 / 0.654 | 0.004 | ≈ 16 |
 | **Deep Learning Only** (YOLO11n crop → ConvNeXt-Tiny) | 93.4% | 99.2% | 0.990 / 0.953 | 0.145 | ≈ 205 |
-| **Proposed Hybrid System** | 93.4% | 99.2% | 0.990 / 0.953 | **0.012** | ≈ 288 (end to end) |
+| **Proposed Hybrid System** | 93.4% | 99.2% | 0.990 / 0.953 | **0.012** | ≈ 288 (end to end, one car; +≈ 200 per extra car) |
 
 Further results on the same test set:
 - **Detection:** the COCO-pretrained YOLO11n scored mAP@0.5 0.855 and mAP@0.5:0.95 0.782; after fine-tuning, 0.990 and **0.933**.
@@ -156,7 +156,7 @@ Classical feature families (validation, SVM top-1 21.3%): removing HOG drops it 
   * **Dataset coverage:** Stanford Cars ends in 2012 and covers US-market models. Cars outside it are flagged "not in records" (25 of 25 modern probe photos), but they can't be verified. The open-set fallback names the exact model correctly only 36% of the time (top-3: 52%), and Gemini's optional AI identification is labelled unverified.
   * **Strictness:** the strict policy sends 17% of legitimate cars to a manual check.
   * **Over-eager quality gate:** it requests retakes for low-resolution and blurred photos that would often still be classified correctly.
-  * **One car per photo:** when several cars are in the frame, the system detects all of them but classifies only the highest-scoring detection.
+  * **Multi-car photos:** every confident vehicle (up to 6) is boxed, numbered and identified with its own verdict, and a registration claim is checked against the main (highest-scoring) car. Stanford Cars labels one car per image, so the multi-car path is demonstrated (app demo "Two cars", `scripts/run_inference.py`) but has no ground truth to score it against.
 
 ---
 

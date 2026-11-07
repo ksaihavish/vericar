@@ -195,6 +195,15 @@ with tab_check:
                 if v["status"] not in ("UNKNOWN", "RETAKE"):
                     what = "Evidence for the registered vehicle" if claim is not None else "Confidence"
                     st.progress(max(0.0, min(1.0, conf)), text=f"{what} · {conf:.0%} (needs {thr:.0%} to commit)")
+            ov = res.get("other_vehicles") or []
+            if ov:
+                st.markdown(f":material/directions_car: **Other cars in this photo** ({len(ov)}, numbered on the image)")
+                st.dataframe(pd.DataFrame([{
+                    "#": i + 2, "Identification": "Not in records" if o["unknown"] else o["label"],
+                    "Confidence": o["confidence"], "Status": ui.STATUS.get(o["status"], ("", "", o["status"], ""))[2]}
+                    for i, o in enumerate(ov)]), hide_index=True, width="stretch",
+                    column_config={"Confidence": st.column_config.ProgressColumn(format="percent", min_value=0,
+                                                                                 max_value=1)})
             if claim is None and not res["unknown"]:
                 st.slider("Confidence threshold", 0.20, 0.95, float(eng.thr.identify), 0.01, key="id_thr",
                           help="Below this the app shows the top 3 instead of one answer.")

@@ -54,6 +54,7 @@ The single entry point is `VeriCar.analyze(image, claim=None)`. It returns the b
 Classical ROI (auto-Canny with median-based thresholds → closing with a kernel at 3% of the image size → largest external contour) → crop → 128×64 → CLAHE → **3,913-d descriptor**: HOG (3,780), LBP 8/1 + 16/2 and GLCM (60), HSV histograms + Lab moments (38), geometry (35). Then StandardScaler → PCA-256 (whitened) → RBF-SVM with Platt probabilities. The SVM (C=3) beat a 500-tree random forest on validation (21.3% vs 9.3% top-1).
 
 ### 5.2 Detector
+Every confident detection (score ≥ 0.35, at least 40 px and 1% of the image, up to six) is classified separately and numbered on the photo. The highest-scoring car gets the full analysis and the claim check; the others get their own identification and unknown-car checks.
 YOLO11n pretrained on COCO, fine-tuned as a single-class "car" detector (640 px, ≤ 25 epochs, early stopping patience 5, AdamW, cosine LR). If no box is found at confidence 0.25, the threshold drops to 0.05; if there is still nothing, the classical ROI is used and the verdict becomes RETAKE ("no vehicle detected").
 
 ### 5.3 Fine-grained classifier

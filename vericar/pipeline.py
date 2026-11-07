@@ -62,8 +62,25 @@ class VeriCar:
     def _locate(self, img: np.ndarray) -> tuple[tuple, str, float]:
         dets = self.detector.detect(img, conf=0.25) or self.detector.detect(img, conf=0.05)
         if dets:
-            return dets[0][0], "yolo", dets[0][1]
-        return cl.classical_roi(img)["box"], "classical-fallback", 0.0
+            return dets[0][0], "yolo", dets[0][1], dets
+        return cl.classical_roi(img)["box"], "classical-fallback", 0.0, []
+
+    def _identify_box(self, img: np.ndarray, box, score: float, thr: Thresholds) -> dict:
+        """Identify one additional vehicle: crop -> quality -> enhancement -> CNN -> unknown checks."""
+        crop = crop_box(img, box, CROP_MARGIN)
+        q = quality_report(crop)
+        enh, _ = adaptive_enhance(crop, q)
+        logits, feats = self.classifier.predict(preprocess(enh))
+        p = fuse(logits[0], self.temperature, None, 0.0)
+        reasons = ["looks unlike every training car"] if float(self.ood.score(feats)[0]) > self.ood.threshold else []
+        open_set = self.openset(enh) if self.openset is not None else None
+        if open_set is not None and open_set["flag"]:
+            reasons.append("closer to a post-2012 model than to any known class")
+        v = identify(p, self.hier, thr, bool(reasons), list(q.issues))
+        top = top_candidates(p, self.hier, 3)
+        return {"box": [round(x, 1) for x in box], "det_score": float(score), "status": v.status,
+                "label": top[0]["label"], "confidence": top[0]["prob"], "unknown": bool(reasons),
+                "open_set_top": [t["label"] for t in (open_set or {}).get("top", [])] if reasons else []}
 
     # ------------------------------------------------------------------ main
     def analyze(self, image, claim: int | None = None, identify_threshold: float | None = None,
@@ -75,7 +92,7 @@ class VeriCar:
 
         # ---- detection
         t1 = time.perf_counter()
-        box, box_src, det_score = self._locate(img)
+        box, box_src, det_score, dets = self._locate(img)
         crop = crop_box(img, box, CROP_MARGIN)
         t["detect"] = time.perf_counter() - t1
 
@@ -121,6 +138,17 @@ class VeriCar:
         t["hybrid"] = time.perf_counter() - t1
 
         top = top_candidates(p_hybrid, self.hier, 5)
+        cam = None
+        if self.cam_weights is not None:          # CAM from the ONNX forward pass: free, no PyTorch
+            cam = self.classifier.cam(int(top[0]["class_idx"]), enhanced.shape[:2], self.cam_weights)
+
+        # ---- every other confident vehicle in the photo gets its own identification (up to 5)
+        t1 = time.perf_counter()
+        h_, w_ = img.shape[:2]
+        others = [(b, s) for b, s in dets[1:] if s >= 0.35 and min(b[2] - b[0], b[3] - b[1]) >= 40
+                  and (b[2] - b[0]) * (b[3] - b[1]) >= 0.01 * h_ * w_][:5]
+        vehicles = [self._identify_box(img, b, s, thr) for b, s in others]
+        t["other_vehicles"] = time.perf_counter() - t1
         out = {
             "box": [round(v, 1) for v in box], "box_source": box_src, "det_score": det_score,
             "image_size": list(img.shape[:2]),
@@ -131,6 +159,7 @@ class VeriCar:
             "unknown_reasons": reasons, "open_set": open_set,
             "guess": educated_guess(p_hybrid, self.hier),
             "p_hybrid": p_hybrid.astype(np.float32), "issues": issues,   # lets the UI re-threshold instantly
+            "other_vehicles": vehicles,
             "methods": {
                 "classical": top_candidates(p_classical, self.hier, 5),
                 "deep": top_candidates(p_deep, self.hier, 5),
@@ -147,15 +176,13 @@ class VeriCar:
             vis = cl.visualize(img, box)
             out["images"] = {
                 "input": img,
-                "annotated": annotate(img, box, verdict.status, top[0]["label"], top[0]["prob"], croi["box"]),
+                "annotated": annotate(img, box, verdict.status, top[0]["label"], top[0]["prob"], croi["box"],
+                                      others=vehicles),
                 "edges": vis["edges"], "contours": vis["contours"], "hog": vis["hog"], "lbp": vis["lbp"],
                 "crop": crop, "enhanced": enhanced,
                 "classical_crop": crop_box(img, croi["box"], 0.0),
             }
             out["histograms"] = cl.hsv_histograms(crop)
-        cam = None
-        if self.cam_weights is not None:          # CAM from the ONNX forward pass: free, no PyTorch
-            cam = self.classifier.cam(int(top[0]["class_idx"]), enhanced.shape[:2], self.cam_weights)
         if cam is None and gradcam:               # fallback: PyTorch Grad-CAM (offline / old model files)
             cam = self.classifier.gradcam(x_h, int(top[0]["class_idx"]))
         if cam is not None:
@@ -170,13 +197,19 @@ def _top_group(hier: Hierarchy, probs: np.ndarray, level: str) -> dict:
     return {"name": names[i], "prob": float(g[i])}
 
 
-def annotate(img, box, status, label, prob, classical_box=None) -> np.ndarray:
+def annotate(img, box, status, label, prob, classical_box=None, others=None) -> np.ndarray:
     out = img.copy()
     h, w = out.shape[:2]
     th = max(2, round(max(h, w) / 300))
-    if classical_box is not None:
+    if classical_box is not None and not others:
         x1, y1, x2, y2 = map(int, classical_box)
         cv2.rectangle(out, (x1, y1), (x2, y2), (200, 200, 200), 1, cv2.LINE_AA)
+    for k, o in enumerate(others or [], start=2):     # further vehicles: numbered #2, #3, ...
+        out = _draw(out, o["box"], o["status"], f"#{k} " + {"UNKNOWN": "Not in records", "RETAKE": "Retake",
+                    "LOW_CONFIDENCE": f"Unsure ({o['confidence']:.0%})"}.get(o["status"],
+                    f"{o['label']} {o['confidence']:.0%}"), max(1, th - 1))
+    if others:
+        label = f"#1 {label}"
     col = STATUS_COLOURS.get(status, (59, 130, 246))
     x1, y1, x2, y2 = map(int, box)
     cv2.rectangle(out, (x1, y1), (x2, y2), col, th, cv2.LINE_AA)
@@ -189,6 +222,19 @@ def annotate(img, box, status, label, prob, classical_box=None) -> np.ndarray:
     cv2.rectangle(out, (x1, ty - tht - 6), (min(w - 1, x1 + tw + 10), ty + base), col, -1)
     cv2.putText(out, text, (x1 + 5, ty - 2), cv2.FONT_HERSHEY_SIMPLEX, fs, (255, 255, 255), max(1, th - 1),
                 cv2.LINE_AA)
+    return out
+
+
+def _draw(out, box, status, text, th) -> np.ndarray:
+    h, w = out.shape[:2]
+    col = STATUS_COLOURS.get(status, (59, 130, 246))
+    x1, y1, x2, y2 = map(int, box)
+    cv2.rectangle(out, (x1, y1), (x2, y2), col, th, cv2.LINE_AA)
+    fs = max(0.4, max(h, w) / 1300)
+    (tw, tht), base = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, fs, 1)
+    ty = y1 - 5 if y1 - tht - 8 > 0 else y1 + tht + 8
+    cv2.rectangle(out, (x1, ty - tht - 5), (min(w - 1, x1 + tw + 8), ty + base), col, -1)
+    cv2.putText(out, text, (x1 + 4, ty - 2), cv2.FONT_HERSHEY_SIMPLEX, fs, (255, 255, 255), 1, cv2.LINE_AA)
     return out
 
 
