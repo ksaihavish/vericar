@@ -1,6 +1,6 @@
 1RUA24CSE0212,1RUA24CSE0158,1RUA24CSE0159,1RUA24CSE0134
 
-# Evaluation results - P5 (Team TXX): VeriCar
+# Evaluation results - P5 (Team T70 · Quantum Minds): VeriCar
 
 Official Stanford Cars test set, **8,041 images, evaluated once** after all parameters were frozen on an 85/15 stratified train/validation split (seed 42) of the official training set. Robustness uses a fixed random 1,000-image test subset.
 

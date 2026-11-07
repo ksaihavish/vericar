@@ -27,11 +27,11 @@ A **cloned plate** is a real registration number copied onto a different car, us
 - **Optional AI text (Gemini).** The officer note is generated from the structured verdict only (no image). The second opinion for unknown cars *does* send the car crop to Google's API; it is off when no API key is configured, clearly labelled *unverified*, and never changes the verdict.
 - Dataset images belong to their original owners and are used for research and education only.
 
-### Team
+### Team T70 · Quantum Minds
 
 | Member | Contribution |
 |---|---|
 | Kukkadapu Sai Havish (1RUA24CSE0212) | System design and full implementation: data pipeline, detector, classifier, hybrid verification, evaluation, app and deployment |
-| *(member)* | UI design |
-| *(member)* | ML model training |
-| *(member)* | Classical computer-vision methods |
+| Harshitha Narasimha (1RUA24CSE0158) | UI design |
+| Harshitha R (1RUA24CSE0159) | ML model training |
+| Dhyey Abhay Ghoda (1RUA24CSE0134) | Classical computer-vision methods |

@@ -35,12 +35,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--team", default="TXX")
     ap.add_argument("--usns", default="USN1,USN2,USN3,USN4")
+    ap.add_argument("--name", default="")
     a = ap.parse_args()
     F, O, V, C, H = j("final_test.json"), j("optimization_val.json"), j("val_fitting.json"), j("classical_val.json"), \
         j("training_history.json")
     fails = j("failures.json") or []
     m, d, r, conf, ver = F["methods"], F["detection"], F["robustness"], F["confidence"], F["verification"]
-    L = [a.usns, "", f"# Evaluation results - P5 (Team {a.team}): VeriCar", "",
+    L = [a.usns, "", f"# Evaluation results - P5 (Team {a.team}{' · ' + a.name if a.name else ''}): VeriCar", "",
          f"Official Stanford Cars test set, **{F['n_test']:,} images, evaluated once** after all parameters were frozen "
          "on an 85/15 stratified train/validation split (seed 42) of the official training set. "
          "Robustness uses a fixed random 1,000-image test subset.", ""]

@@ -2,6 +2,10 @@
 
 **Computer Vision Hackathon 2026, Problem Statement 5 (P5)**, Stanford Cars, 196 make/model/year classes.
 
+**Team T70 · Quantum Minds:** Kukkadapu Sai Havish (1RUA24CSE0212) · Harshitha Narasimha (1RUA24CSE0158) · Harshitha R (1RUA24CSE0159) · Dhyey Abhay Ghoda (1RUA24CSE0134)
+
+**Live app:** https://vericar-vbmbegg4p63baw6pfc8pcz.streamlit.app/
+
 VeriCar is built for a parking or fleet officer who needs to answer one question: *"Does this car match what its registration says?"*
 Cloned plates are usually put on a car that looks like the registered one, so the system:
 
@@ -33,7 +37,7 @@ Cloned plates are usually put on a car that looks like the registered one, so th
 - **Cars newer than 2012** (outside Stanford Cars) are caught by two checks: kNN distance to the training embeddings, plus a zero-shot **OpenCLIP ViT-B/32** open-set fallback that was added after the test run. On 25 modern-car photos, 64% are flagged by kNN alone and **100% by both**. CLIP's suggested names are unverified leads only (top-1 correct 36%, top-3 52%).
 - The classical-only pipeline falls to 5.7% on test because its own contour ROI is imprecise (21.3% on clean ground-truth crops in validation).
 
-Full tables (robustness, ablation, optimisation, confidence, failure cases) are in [`docs/eval_P5_<TeamID>.md`](docs/) and the app's Results tab. Design: [`docs/design.md`](docs/design.md) · architecture: [`docs/architecture.md`](docs/architecture.md) · viva prep: [`docs/viva_prep.md`](docs/viva_prep.md).
+Full tables (robustness, ablation, optimisation, confidence, failure cases) are in [`docs/eval_P5_T70.md`](docs/eval_P5_T70.md) and the app's Results tab. Design: [`docs/design.md`](docs/design.md) · architecture: [`docs/architecture.md`](docs/architecture.md) · viva prep: [`docs/viva_prep.md`](docs/viva_prep.md).
 
 ## Run it (one command)
 

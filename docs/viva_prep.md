@@ -1,10 +1,10 @@
 # Viva preparation
 
-The rubric gives 25 points to the demo and viva: *"every member can explain their own part, the model and classical choices, the metrics and a failure case."* Each section below belongs to one member. Read your own section and the **shared core** at the end. Numbers are in `docs/eval_P5_<TeamID>.md`.
+The rubric gives 25 points to the demo and viva: *"every member can explain their own part, the model and classical choices, the metrics and a failure case."* Each section below belongs to one member. Read your own section and the **shared core** at the end. Numbers are in `docs/eval_P5_T70.md`.
 
 ---
 
-## 1. Team lead: system, hybrid verification, evaluation, deployment
+## 1. Kukkadapu Sai Havish (1RUA24CSE0212): system, hybrid verification, evaluation, deployment
 
 **What it does.** `VeriCar.analyze(image, claim)` runs three pipelines on every photo and turns the hybrid's probabilities into a verdict: MATCH / PARTIAL / INSPECT / MISMATCH / UNKNOWN / RETAKE.
 
@@ -18,7 +18,7 @@ The rubric gives 25 points to the demo and viva: *"every member can explain thei
 - *What happens with a 2024 car?* Two independent unknown checks: kNN distance to our training embeddings, and an open-source OpenCLIP ViT-B/32 model (zero-shot, not trained by us) that compares the photo with text names of our 196 classes plus 343 post-2012 models. On 25 modern-car photos, kNN alone flagged 64% and both together flagged 100% (25 of 25). CLIP's names are shown as unverified leads (top-3 right 52% of the time), never as an identification, and CLIP can only *send a car to manual check*, never clear one. We added it after the test run and say so.
 - *What does Gemini do?* Only wording: it writes the officer note from the structured verdict (text only), and gives a labelled "unverified" second opinion for UNKNOWN cars. It never changes a verdict, and the app works without it.
 
-## 2. ML model training
+## 2. Harshitha R (1RUA24CSE0159): ML model training
 
 **What it does.** ConvNeXt-Tiny, ImageNet-22k pre-trained, fine-tuned on car crops at 384 px for 196 classes.
 
@@ -37,7 +37,7 @@ The rubric gives 25 points to the demo and viva: *"every member can explain thei
 - *What is temperature scaling?* One scalar T divides the logits so confidences match observed accuracy (lower ECE). Fitted on validation; it does not change the top-1 label.
 - *Optimisation?* ONNX FP32 → FP16 → INT8 (dynamic and static with calibration on training crops). We ship the fastest variant within 0.5 points of FP32 accuracy on validation.
 
-## 3. Classical computer vision
+## 3. Dhyey Abhay Ghoda (1RUA24CSE0134): classical computer vision
 
 **What it does.** A full non-learning-based perception path, plus classical components inside the hybrid.
 
@@ -53,7 +53,7 @@ The rubric gives 25 points to the demo and viva: *"every member can explain thei
 - *Which classical features matter?* The feature-family ablation: removing HOG drops validation top-1 from 21.3% to 8.3%, while removing colour barely matters (a model's paint colour varies, so colour says little about the model).
 - *Where does classical help the hybrid?* Be honest, because the numbers are honest. The validation-fitted fusion weight came out 0, so the classical SVM doesn't change the label. Classical CV does the ROI fallback, the quality gate (it turns very blurry or tiny inputs into RETAKE instead of confident mistakes) and the contour detector (mAP@0.5 0.64 with no learning). Adaptive gamma + CLAHE actually *hurt* on very dark photos (90.4% vs 93.5%), because the CNN's brightness augmentation already copes with darkness. That's a real finding, and we report it.
 
-## 4. UI design
+## 4. Harshitha Narasimha (1RUA24CSE0158): UI design
 
 **What it does.** A Streamlit app built for a phone-holding officer: verdict first, then evidence.
 
