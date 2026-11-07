@@ -189,12 +189,3 @@ The batch script writes one annotated image per input and a `predictions.jsonl` 
 * Model files ship as a GitHub release (`models-v1`) and are downloaded and checksum-verified on first start.
 * A `Dockerfile` (CPU image) and one-command launchers (`run.ps1`, `run.sh`, `start.bat`) cover local or self-hosted use.
 * The optional `GEMINI_API_KEY` (officer note, AI identification for unknown cars) is a host secret and never committed. The app works fully without it.
-
----
-
-### Student Submission Checklist
-
-- [x] Working GitHub repository link included with an updated `README.md`.  
-- [x] No raw code pasted into this report.  
-- [x] All table metrics match test runs reproducible via the repository (`results/*.json`, `scripts/evaluate_final.py`).  
-- [x] All team member details accurately recorded.
