@@ -1,12 +1,12 @@
 {
- "pipeline": "VeriCar.analyze with intermediates, ONNX FP32 classifier, YOLO on CPU",
+ "pipeline": "Deployed VeriCar.analyze: ONNX YOLO11n detector, ONNX FP32 ConvNeXt-T with CAM, classical SVM, kNN + OpenCLIP INT8 unknown checks, all on CPU (no PyTorch)",
  "median_ms": {
-  "load": 4.1,
-  "detect": 68.65,
-  "classical": 21.5,
-  "deep": 96.44999999999999,
-  "hybrid": 7.1,
-  "total": 201.85
+  "load": 3.8,
+  "detect": 82.4,
+  "classical": 16.4,
+  "deep": 121.80000000000001,
+  "hybrid": 58.15,
+  "total": 288.1
  },
  "n": 20
 }

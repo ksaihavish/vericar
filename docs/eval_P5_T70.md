@@ -49,11 +49,11 @@ End-to-end deployed pipeline (`VeriCar.analyze`, ONNX FP32 classifier, YOLO on C
 | Stage | ms |
 |---|---|
 | load | 4 |
-| detect | 69 |
-| classical | 22 |
-| deep | 96 |
-| hybrid | 7 |
-| total | 202 |
+| detect | 82 |
+| classical | 16 |
+| deep | 122 |
+| hybrid | 58 |
+| total | 288 |
 
 Notes:
 
