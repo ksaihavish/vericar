@@ -114,7 +114,7 @@ Streamlit Community Cloud, deployed from this GitHub repo (Hugging Face now requ
 
 | Member | Contribution |
 |---|---|
-| Team lead | System design and full implementation (data, detector, classifier, hybrid verification, evaluation, app, deployment) |
+| Kukkadapu Sai Havish (1RUA24CSE0212) | System design and full implementation (data, detector, classifier, hybrid verification, evaluation, app, deployment) |
 | Member 2 | UI design |
 | Member 3 | ML model training |
 | Member 4 | Classical computer-vision methods |

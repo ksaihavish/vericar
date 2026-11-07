@@ -31,7 +31,7 @@ A **cloned plate** is a real registration number copied onto a different car, us
 
 | Member | Contribution |
 |---|---|
-| *(team lead)* | System design and full implementation: data pipeline, detector, classifier, hybrid verification, evaluation, app and deployment |
+| Kukkadapu Sai Havish (1RUA24CSE0212) | System design and full implementation: data pipeline, detector, classifier, hybrid verification, evaluation, app and deployment |
 | *(member)* | UI design |
 | *(member)* | ML model training |
 | *(member)* | Classical computer-vision methods |
