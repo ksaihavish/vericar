@@ -37,7 +37,7 @@ Cloned plates are usually put on a car that looks like the registered one, so th
 - **Cars newer than 2012** (outside Stanford Cars) are caught by two checks: kNN distance to the training embeddings, plus a zero-shot **OpenCLIP ViT-B/32** open-set fallback that was added after the test run. On 25 modern-car photos, 64% are flagged by kNN alone and **100% by both**. CLIP's suggested names are unverified leads only (top-1 correct 36%, top-3 52%).
 - The classical-only pipeline falls to 5.7% on test because its own contour ROI is imprecise (21.3% on clean ground-truth crops in validation).
 
-Full tables (robustness, ablation, optimisation, confidence, failure cases) are in [`docs/eval_P5_T70.md`](docs/eval_P5_T70.md) and the app's Results tab. Design: [`docs/design.md`](docs/design.md) · architecture: [`docs/architecture.md`](docs/architecture.md) · viva prep: [`docs/viva_prep.md`](docs/viva_prep.md).
+**Reports:** technical solution report [`docs/Hackathon_Solution_Report_T70.md`](docs/Hackathon_Solution_Report_T70.md) · full evaluation tables (robustness, ablation, optimisation, confidence, failure cases) [`docs/eval_P5_T70.md`](docs/eval_P5_T70.md) and the app's Results tab. Design: [`docs/design.md`](docs/design.md) · architecture: [`docs/architecture.md`](docs/architecture.md) · viva prep: [`docs/viva_prep.md`](docs/viva_prep.md).
 
 ## Run it (one command)
 
@@ -61,6 +61,14 @@ docker build -t vericar . && docker run -p 7860:7860 vericar
 
 The launcher creates a Python 3.12 virtual environment, installs `requirements.txt`, downloads the trained models from this repo's GitHub release (SHA-256 verified) and starts the Streamlit app.
 `GEMINI_API_KEY` in a `.env` file is **optional** and only enables the officer-note text and the AI second opinion for unknown cars.
+
+## Batch inference on a folder
+
+```bash
+python scripts/run_inference.py --input_dir ./assets/demo/ --output_dir ./results/inference/
+```
+
+Writes an annotated image per photo and `predictions.jsonl` (box, verdict, make/model/year, confidence). Add `--claim "Audi S4 Sedan 2012"` to verify a registration.
 
 ## Reproduce training and evaluation
 
