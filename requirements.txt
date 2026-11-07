@@ -14,3 +14,4 @@ plotly==7.1.0
 pandas==3.1.1
 google-genai==3.0.0
 python-dotenv==1.2.4
+# build: 2026-11-07 multi-car release

@@ -16,9 +16,34 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "app"))
 
+import streamlit as st  # noqa: E402
+
+
+# ---- self-refresh after a code update: hosts keep the old process (and its caches) alive across git pushes
+def _code_version() -> str:
+    h = hashlib.sha1()
+    for p in sorted(list((ROOT / "vericar").glob("*.py")) + [ROOT / "assets" / "demo" / "demo.json",
+                                                              ROOT / "scripts" / "models_manifest.json"]):
+        if p.exists():
+            h.update(p.read_bytes())
+    return h.hexdigest()
+
+
+@st.cache_resource
+def _deployed() -> dict:
+    return {"version": None}
+
+
+_v = _code_version()
+if _deployed()["version"] not in (None, _v):
+    for _m in [m for m in sys.modules if m == "vericar" or m.startswith("vericar.")]:
+        del sys.modules[_m]                     # re-import the updated pipeline modules
+    st.cache_resource.clear()
+    st.cache_data.clear()
+_deployed()["version"] = _v
+
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-import streamlit as st  # noqa: E402
 from PIL import Image, UnidentifiedImageError  # noqa: E402
 
 import components as ui  # noqa: E402
