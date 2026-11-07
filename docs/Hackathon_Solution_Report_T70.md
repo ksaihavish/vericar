@@ -123,6 +123,12 @@ Figures in the repository (regenerate with `python scripts/make_figures.py`):
 4. **Failure panels** (`results/failures/*.png`): detection, classifier crop, Grad-CAM and reference images for each analysed failure.
 5. **Live:** every intermediate image is shown for any uploaded photo on the app's **Pipeline steps** tab, and the **Classical vs deep vs hybrid** tab compares the three methods on that photo.
 
+![Intermediate representations](../results/figures/pipeline_stages.png)
+
+![Verdict examples](../results/figures/verdict_examples.png)
+
+![Robustness examples](../results/figures/robustness_examples.png)
+
 ### 3.3 Ablation Study
 
 Test set, one component removed at a time from the full hybrid:
